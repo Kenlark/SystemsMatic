@@ -1,58 +1,86 @@
-import { Injectable, ConflictException, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { User } from './user.entity';
+import {
+  Injectable,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
+import { PrismaService } from '../prisma/prisma.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcryptjs';
 
 @Injectable()
 export class UsersService {
-  constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
-  ) {}
+  constructor(private prisma: PrismaService) {}
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto) {
     const { email, username, password, firstName, lastName } = createUserDto;
 
     // Vérifier si l'email existe déjà
-    const existingEmail = await this.usersRepository.findOne({ where: { email } });
+    const existingEmail = await this.prisma.user.findUnique({
+      where: { email },
+    });
     if (existingEmail) {
       throw new ConflictException('Un utilisateur avec cet email existe déjà');
     }
 
     // Vérifier si le nom d'utilisateur existe déjà
-    const existingUsername = await this.usersRepository.findOne({ where: { username } });
+    const existingUsername = await this.prisma.user.findUnique({
+      where: { username },
+    });
     if (existingUsername) {
-      throw new ConflictException('Ce nom d\'utilisateur est déjà pris');
+      throw new ConflictException("Ce nom d'utilisateur est déjà pris");
     }
 
     // Hasher le mot de passe
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Créer l'utilisateur
-    const user = this.usersRepository.create({
-      email,
-      username,
-      password: hashedPassword,
-      firstName,
-      lastName,
+    return this.prisma.user.create({
+      data: {
+        email,
+        username,
+        password: hashedPassword,
+        firstName,
+        lastName,
+      },
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
-
-    return this.usersRepository.save(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find({
-      select: ['id', 'email', 'username', 'firstName', 'lastName', 'createdAt', 'updatedAt'],
+  async findAll() {
+    return this.prisma.user.findMany({
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
-  async findOne(id: string): Promise<User> {
-    const user = await this.usersRepository.findOne({
+  async findOne(id: string) {
+    const user = await this.prisma.user.findUnique({
       where: { id },
-      select: ['id', 'email', 'username', 'firstName', 'lastName', 'createdAt', 'updatedAt'],
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
 
     if (!user) {
@@ -62,44 +90,67 @@ export class UsersService {
     return user;
   }
 
-  async findByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOne({ where: { email } });
+  async findByEmail(email: string) {
+    return this.prisma.user.findUnique({ where: { email } });
   }
 
-  async findByUsername(username: string): Promise<User> {
-    return this.usersRepository.findOne({ where: { username } });
+  async findByUsername(username: string) {
+    return this.prisma.user.findUnique({ where: { username } });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async update(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ) {
     const user = await this.findOne(id);
 
     // Vérifier si le nouvel email existe déjà (si modifié)
     if (updateUserDto.email && updateUserDto.email !== user.email) {
-      const existingEmail = await this.usersRepository.findOne({ where: { email: updateUserDto.email } });
+      const existingEmail = await this.prisma.user.findUnique({
+        where: { email: updateUserDto.email },
+      });
       if (existingEmail) {
-        throw new ConflictException('Un utilisateur avec cet email existe déjà');
+        throw new ConflictException(
+          'Un utilisateur avec cet email existe déjà',
+        );
       }
     }
 
     // Vérifier si le nouveau nom d'utilisateur existe déjà (si modifié)
     if (updateUserDto.username && updateUserDto.username !== user.username) {
-      const existingUsername = await this.usersRepository.findOne({ where: { username: updateUserDto.username } });
+      const existingUsername = await this.prisma.user.findUnique({
+        where: { username: updateUserDto.username },
+      });
       if (existingUsername) {
-        throw new ConflictException('Ce nom d\'utilisateur est déjà pris');
+        throw new ConflictException("Ce nom d'utilisateur est déjà pris");
       }
     }
 
+    // Préparer les données de mise à jour
+    const updateData: any = { ...updateUserDto };
+
     // Hasher le nouveau mot de passe si fourni
     if (updateUserDto.password) {
-      updateUserDto.password = await bcrypt.hash(updateUserDto.password, 10);
+      updateData.password = await bcrypt.hash(updateUserDto.password, 10);
     }
 
-    Object.assign(user, updateUserDto);
-    return this.usersRepository.save(user);
+    return this.prisma.user.update({
+      where: { id },
+      data: updateData,
+      select: {
+        id: true,
+        email: true,
+        username: true,
+        firstName: true,
+        lastName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
   }
 
   async remove(id: string): Promise<void> {
-    const user = await this.findOne(id);
-    await this.usersRepository.remove(user);
+    await this.findOne(id); // Vérifier que l'utilisateur existe
+    await this.prisma.user.delete({ where: { id } });
   }
 }

@@ -30,6 +30,7 @@ Thumbs.db
 # Logs
 logs/
 *.log
+console.log
 
 # Runtime data
 pids/
