@@ -8,17 +8,15 @@ export const api = axios.create({
 
 // Intercepteur pour ajouter le token dans les headers si disponible
 api.interceptors.request.use((config) => {
-  // Essayer d'abord les cookies
-  let token = getCookie("access_token");
-
-  // Fallback vers localStorage en production si les cookies ne fonctionnent pas
-  if (!token && process.env.NODE_ENV === "production") {
-    token = localStorage.getItem("access_token");
+  // En production, utiliser localStorage comme fallback si cookies httpOnly ne fonctionnent pas
+  if (process.env.NODE_ENV === "production") {
+    const token = localStorage.getItem("access_token");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
-
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
+  // En développement, les cookies httpOnly sont automatiquement envoyés
+  // Pas besoin d'intercepteur côté client
   return config;
 });
 
@@ -26,13 +24,11 @@ api.interceptors.request.use((config) => {
 export const setAuthToken = (token: string) => {
   // Vérifier que le token semble valide (JWT basique)
   if (typeof window !== "undefined" && token && token.split(".").length === 3) {
-    // Essayer d'abord les cookies
-    setCookie("access_token", token);
-
-    // En production, aussi stocker dans localStorage comme fallback
+    // En production, stocker dans localStorage comme fallback pour les cookies httpOnly
     if (process.env.NODE_ENV === "production") {
       localStorage.setItem("access_token", token);
     }
+    // En développement, les cookies httpOnly sont gérés automatiquement par le backend
   } else {
     console.warn("Token invalide, non stocké");
   }
@@ -40,25 +36,22 @@ export const setAuthToken = (token: string) => {
 
 // Fonction pour supprimer le token
 export const removeAuthToken = () => {
-  removeCookie("access_token");
-
-  // Aussi supprimer de localStorage en production
+  // Supprimer de localStorage en production
   if (process.env.NODE_ENV === "production") {
     localStorage.removeItem("access_token");
   }
+  // En développement, les cookies httpOnly sont supprimés par le backend lors du logout
 };
 
 // Fonction pour récupérer le token
 export const getAuthToken = () => {
-  // Essayer d'abord les cookies
-  let token = getCookie("access_token");
-
-  // Fallback vers localStorage en production si les cookies ne fonctionnent pas
-  if (!token && process.env.NODE_ENV === "production") {
-    token = localStorage.getItem("access_token");
+  // En production, récupérer depuis localStorage (cookies httpOnly non accessibles)
+  if (process.env.NODE_ENV === "production") {
+    return localStorage.getItem("access_token");
   }
-
-  return token;
+  // En développement, on ne peut pas lire les cookies httpOnly côté client
+  // Cette fonction ne sera utilisée que pour des vérifications optionnelles
+  return null;
 };
 
 // Fonction pour se déconnecter

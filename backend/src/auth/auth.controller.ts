@@ -36,7 +36,7 @@ export class AuthController {
     // Configuration des cookies selon l'environnement
     const isProduction = process.env.NODE_ENV === 'production';
     const cookieOptions: any = {
-      httpOnly: false, // Laissé à false pour permettre l'accès côté client
+      httpOnly: true, // SÉCURISÉ : JavaScript ne peut pas accéder au cookie
       secure: isProduction, // Seulement HTTPS en production
       sameSite: isProduction ? 'none' : 'lax', // 'none' nécessaire pour les domaines différents
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
@@ -87,7 +87,7 @@ export class AuthController {
     // Configuration des cookies selon l'environnement
     const isProduction = process.env.NODE_ENV === 'production';
     const cookieOptions: any = {
-      httpOnly: false, // Laissé à false pour permettre l'accès côté client
+      httpOnly: true, // SÉCURISÉ : JavaScript ne peut pas accéder au cookie
       secure: isProduction, // Seulement HTTPS en production
       sameSite: isProduction ? 'none' : 'lax', // 'none' nécessaire pour les domaines différents
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
