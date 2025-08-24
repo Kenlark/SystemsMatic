@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getCookie, setCookie, removeCookie } from "./cookies";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
@@ -7,31 +8,19 @@ export const api = axios.create({
 
 // Intercepteur pour ajouter le token dans les headers si disponible
 api.interceptors.request.use((config) => {
-  // Essayer d'abord le localStorage (pour la production)
-  const token = localStorage.getItem("access_token");
+  // Récupérer le token depuis les cookies
+  const token = getCookie("access_token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
-  } else {
-    // Fallback vers les cookies (pour le développement)
-    const cookies = document.cookie.split(";");
-    const accessTokenCookie = cookies.find((cookie) =>
-      cookie.trim().startsWith("access_token=")
-    );
-    if (accessTokenCookie) {
-      const cookieToken = accessTokenCookie.split("=")[1];
-      if (cookieToken && cookieToken !== "") {
-        config.headers.Authorization = `Bearer ${cookieToken}`;
-      }
-    }
   }
   return config;
 });
 
-// Fonction pour stocker le token de manière sécurisée
+// Fonction pour stocker le token de manière sécurisée dans les cookies
 export const setAuthToken = (token: string) => {
   // Vérifier que le token semble valide (JWT basique)
   if (typeof window !== "undefined" && token && token.split(".").length === 3) {
-    localStorage.setItem("access_token", token);
+    setCookie("access_token", token);
   } else {
     console.warn("Token invalide, non stocké");
   }
@@ -39,30 +28,12 @@ export const setAuthToken = (token: string) => {
 
 // Fonction pour supprimer le token
 export const removeAuthToken = () => {
-  localStorage.removeItem("access_token");
-  // Nettoyer aussi les cookies
-  document.cookie =
-    "access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  removeCookie("access_token");
 };
 
-// Fonction pour récupérer le token
+// Fonction pour récupérer le token depuis les cookies
 export const getAuthToken = () => {
-  // Essayer localStorage d'abord
-  const token = localStorage.getItem("access_token");
-  if (token) return token;
-
-  // Fallback vers cookies
-  const cookies = document.cookie.split(";");
-  const accessTokenCookie = cookies.find((cookie) =>
-    cookie.trim().startsWith("access_token=")
-  );
-  if (accessTokenCookie) {
-    const cookieToken = accessTokenCookie.split("=")[1];
-    if (cookieToken && cookieToken !== "") {
-      return cookieToken;
-    }
-  }
-  return null;
+  return getCookie("access_token");
 };
 
 // Fonction pour se déconnecter
@@ -112,11 +83,8 @@ export const login = async (email: string, password: string) => {
     const response = await api.post("/auth/login", { email, password });
 
     if (response.data?.user) {
-      // Si le token est dans la réponse (production), l'utiliser
-      if (response.data.access_token) {
-        setAuthToken(response.data.access_token);
-      }
-
+      // Le token est automatiquement défini dans les cookies par le backend
+      // Plus besoin de gérer le token côté client
       return response.data.user;
     }
 

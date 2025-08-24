@@ -72,11 +72,9 @@ export class AuthController {
       'Set-Cookie': res.getHeaders()['set-cookie'],
     });
 
-    // Retourner les données utilisateur avec le token pour localStorage
+    // Retourner uniquement les données utilisateur (le token est dans le cookie)
     return {
       user: result.user,
-      // En production, inclure le token pour localStorage
-      ...(isProduction && { access_token: result.access_token }),
     };
   }
 

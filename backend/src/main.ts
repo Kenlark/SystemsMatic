@@ -13,7 +13,7 @@ async function bootstrap() {
   // Configuration CORS
   const allowedOrigins =
     process.env.NODE_ENV === 'production'
-      ? ['https://systemsmatic.netlify.app']
+      ? [process.env.CORS_ORIGIN || 'https://systemsmatic.netlify.app']
       : ['http://localhost:3000'];
 
   app.enableCors({
