@@ -37,7 +37,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Utiliser 'lax' pour éviter les problèmes CORS
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
     };
@@ -80,7 +80,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Utiliser 'lax' pour éviter les problèmes CORS
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       path: '/',
     };
 
