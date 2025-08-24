@@ -72,9 +72,11 @@ export class AuthController {
       'Set-Cookie': res.getHeaders()['set-cookie'],
     });
 
-    // Retourner uniquement les données utilisateur (le token est dans le cookie)
+    // En production, aussi retourner le token pour fallback si les cookies ne fonctionnent pas
     return {
       user: result.user,
+      // Fallback token pour la production en cas de problème de cookies cross-origin
+      ...(isProduction && { access_token: result.access_token }),
     };
   }
 

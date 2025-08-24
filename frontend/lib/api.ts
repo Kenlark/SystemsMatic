@@ -8,19 +8,31 @@ export const api = axios.create({
 
 // Intercepteur pour ajouter le token dans les headers si disponible
 api.interceptors.request.use((config) => {
-  // Récupérer le token depuis les cookies
-  const token = getCookie("access_token");
+  // Essayer d'abord les cookies
+  let token = getCookie("access_token");
+
+  // Fallback vers localStorage en production si les cookies ne fonctionnent pas
+  if (!token && process.env.NODE_ENV === "production") {
+    token = localStorage.getItem("access_token");
+  }
+
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
 
-// Fonction pour stocker le token de manière sécurisée dans les cookies
+// Fonction pour stocker le token de manière sécurisée
 export const setAuthToken = (token: string) => {
   // Vérifier que le token semble valide (JWT basique)
   if (typeof window !== "undefined" && token && token.split(".").length === 3) {
+    // Essayer d'abord les cookies
     setCookie("access_token", token);
+
+    // En production, aussi stocker dans localStorage comme fallback
+    if (process.env.NODE_ENV === "production") {
+      localStorage.setItem("access_token", token);
+    }
   } else {
     console.warn("Token invalide, non stocké");
   }
@@ -29,11 +41,24 @@ export const setAuthToken = (token: string) => {
 // Fonction pour supprimer le token
 export const removeAuthToken = () => {
   removeCookie("access_token");
+
+  // Aussi supprimer de localStorage en production
+  if (process.env.NODE_ENV === "production") {
+    localStorage.removeItem("access_token");
+  }
 };
 
-// Fonction pour récupérer le token depuis les cookies
+// Fonction pour récupérer le token
 export const getAuthToken = () => {
-  return getCookie("access_token");
+  // Essayer d'abord les cookies
+  let token = getCookie("access_token");
+
+  // Fallback vers localStorage en production si les cookies ne fonctionnent pas
+  if (!token && process.env.NODE_ENV === "production") {
+    token = localStorage.getItem("access_token");
+  }
+
+  return token;
 };
 
 // Fonction pour se déconnecter
@@ -84,7 +109,11 @@ export const login = async (email: string, password: string) => {
 
     if (response.data?.user) {
       // Le token est automatiquement défini dans les cookies par le backend
-      // Plus besoin de gérer le token côté client
+      // En production, utiliser aussi le token retourné comme fallback
+      if (response.data.access_token) {
+        setAuthToken(response.data.access_token);
+      }
+
       return response.data.user;
     }
 

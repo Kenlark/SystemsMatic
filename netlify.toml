@@ -9,3 +9,12 @@
 [build.environment]
   NODE_VERSION = "18"
   NEXT_PUBLIC_API_URL = "https://systemsmatic.onrender.com"
+
+# Configuration des headers pour améliorer la gestion des cookies cross-origin
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
