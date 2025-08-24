@@ -37,7 +37,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
+      sameSite: 'lax', // Utiliser 'lax' même en production pour test
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
     };
@@ -66,6 +66,11 @@ export class AuthController {
     // Définir le token dans un cookie HTTP-only
     res.cookie('access_token', result.access_token, cookieOptions);
 
+    // Log pour debug - vérifier les headers de réponse
+    console.log('Login - Response headers:', {
+      'Set-Cookie': res.getHeaders()['set-cookie'],
+    });
+
     // Retourner seulement les données utilisateur (sans le token)
     return {
       user: result.user,
@@ -80,7 +85,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
+      sameSite: 'lax', // Utiliser 'lax' même en production pour test
       path: '/',
     };
 
