@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { api } from "lib/api";
 import Link from "next/link";
 
 interface RegisterForm {
@@ -24,7 +24,7 @@ export default function RegisterPage() {
     setMessage("");
 
     try {
-      await axios.post("/api/users", data);
+      await api.post("/users", data);
       setMessage("Inscription réussie! Vous pouvez maintenant vous connecter.");
       registerForm.reset();
     } catch (error: any) {

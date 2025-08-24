@@ -8,25 +8,32 @@ async function bootstrap() {
 
   // Configuration CORS
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://frontend:3000'],
+    origin: [
+      process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+      'https://<ton-site>.netlify.app',
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
   });
 
   // Validation globale
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transform: true,
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
+  );
 
   // Configuration Swagger
   const config = new DocumentBuilder()
-    .setTitle('System\'s Matic API')
-    .setDescription('API pour l\'application System\'s Matic')
+    .setTitle("System's Matic API")
+    .setDescription("API pour l'application System's Matic")
     .setVersion('1.0')
     .addBearerAuth()
     .build();
-  
+
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 

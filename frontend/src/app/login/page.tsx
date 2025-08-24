@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import axios from "axios";
+import { api } from "lib/api";
 import Link from "next/link";
 
 interface LoginForm {
@@ -21,7 +21,7 @@ export default function LoginPage() {
     setMessage("");
 
     try {
-      const response = await axios.post("/api/auth/login", data);
+      const response = await api.post("/auth/login", data);
       setMessage("Connexion réussie!");
       console.log("Token:", response.data.access_token);
     } catch (error: any) {
