@@ -24,6 +24,7 @@ interface AuthContextType {
   login: (userData: User) => void;
   logoutUser: () => Promise<void>;
   checkAuthStatus: () => Promise<void>;
+  resetAuth: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -73,12 +74,23 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logoutUser = async () => {
     try {
       const success = await logout();
-      if (success) {
-        setUser(null);
-      }
+      // Même si la requête échoue, on force la déconnexion côté client
+      resetAuth();
+      // Re-vérifier l'état d'authentification après un court délai
+      setTimeout(() => {
+        checkAuthStatus();
+      }, 100);
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
+      // Même en cas d'erreur, on force la déconnexion côté client
+      resetAuth();
     }
+  };
+
+  const resetAuth = () => {
+    setUser(null);
+    setIsLoading(false);
+    setIsInitialized(true);
   };
 
   // Vérifier l'authentification au montage du composant
@@ -99,6 +111,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     logoutUser,
     checkAuthStatus,
+    resetAuth,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

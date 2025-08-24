@@ -12,7 +12,9 @@ export const logout = async () => {
     return true;
   } catch (error) {
     console.error("Erreur lors de la déconnexion:", error);
-    return false;
+    // En cas d'erreur, on considère que la déconnexion a réussi côté client
+    // car le cookie pourrait avoir été supprimé malgré l'erreur
+    return true;
   }
 };
 
