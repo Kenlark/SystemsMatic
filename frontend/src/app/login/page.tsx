@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { api } from "lib/api";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface LoginForm {
   email: string;
@@ -13,6 +14,7 @@ interface LoginForm {
 export default function LoginPage() {
   const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const loginForm = useForm<LoginForm>();
 
@@ -23,7 +25,11 @@ export default function LoginPage() {
     try {
       const response = await api.post("/auth/login", data);
       setMessage("Connexion réussie!");
-      console.log("Token:", response.data.access_token);
+
+      // Rediriger vers la page d'accueil après un court délai
+      setTimeout(() => {
+        router.push("/");
+      }, 1000);
     } catch (error: any) {
       setMessage(
         error.response?.data?.message || "Erreur lors de la connexion"

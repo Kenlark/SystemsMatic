@@ -1,5 +1,19 @@
-import { Controller, Post, Body, UseGuards, Get, Request } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Post,
+  Body,
+  UseGuards,
+  Get,
+  Request,
+  Res,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -13,14 +27,46 @@ export class AuthController {
   @ApiOperation({ summary: 'Connexion utilisateur' })
   @ApiResponse({ status: 200, description: 'Connexion réussie' })
   @ApiResponse({ status: 401, description: 'Email ou mot de passe incorrect' })
-  async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+  async login(
+    @Body() loginDto: LoginDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const result = await this.authService.login(loginDto);
+
+    // Définir le token dans un cookie HTTP-only
+    res.cookie('access_token', result.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production', // HTTPS en production
+      sameSite: 'lax',
+      maxAge: 24 * 60 * 60 * 1000, // 24 heures
+      path: '/',
+    });
+
+    // Retourner seulement les données utilisateur (sans le token)
+    return {
+      user: result.user,
+    };
+  }
+
+  @Post('logout')
+  @ApiOperation({ summary: 'Déconnexion utilisateur' })
+  @ApiResponse({ status: 200, description: 'Déconnexion réussie' })
+  async logout(@Res({ passthrough: true }) res: Response) {
+    // Supprimer le cookie
+    res.clearCookie('access_token', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    return { message: 'Déconnexion réussie' };
   }
 
   @Get('profile')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Récupérer le profil de l\'utilisateur connecté' })
+  @ApiOperation({ summary: "Récupérer le profil de l'utilisateur connecté" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })
   getProfile(@Request() req) {
     return req.user;

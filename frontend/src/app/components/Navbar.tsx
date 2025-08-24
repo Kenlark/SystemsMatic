@@ -1,10 +1,51 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { logout, checkAuth } from "lib/api";
+
+interface User {
+  id: string;
+  email: string;
+  username: string;
+  firstName: string;
+  lastName: string;
+}
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
+  useEffect(() => {
+    const checkUserAuth = async () => {
+      try {
+        // Vérifier uniquement l'authentification côté serveur
+        const authUser = await checkAuth();
+        setUser(authUser);
+      } catch (error) {
+        console.error(
+          "Erreur lors de la vérification d'authentification:",
+          error
+        );
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkUserAuth();
+  }, []);
+
+  const handleLogout = async () => {
+    const success = await logout();
+    if (success) {
+      setUser(null);
+      router.push("/");
+    }
+  };
 
   return (
     <nav className="navbar">
@@ -55,18 +96,38 @@ export default function Navbar() {
 
           {/* Boutons d'authentification */}
           <div className="navbar__auth">
-            <Link
-              href="/login"
-              className="navbar__auth-link navbar__auth-link--login"
-            >
-              Connexion
-            </Link>
-            <Link
-              href="/register"
-              className="navbar__auth-link navbar__auth-link--register"
-            >
-              Inscription
-            </Link>
+            {!isLoading && (
+              <>
+                {user ? (
+                  <div className="navbar__user-menu">
+                    <span className="navbar__user-name">
+                      Bonjour, {user.firstName || user.username}
+                    </span>
+                    <button
+                      onClick={handleLogout}
+                      className="navbar__auth-link navbar__auth-link--logout"
+                    >
+                      Déconnexion
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="navbar__auth-link navbar__auth-link--login"
+                    >
+                      Connexion
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="navbar__auth-link navbar__auth-link--register"
+                    >
+                      Inscription
+                    </Link>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
