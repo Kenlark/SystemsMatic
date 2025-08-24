@@ -37,7 +37,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Utiliser 'lax' même en production pour test
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
     };
@@ -85,7 +85,7 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: false, // Temporairement désactivé pour debug
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax', // Utiliser 'lax' même en production pour test
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       path: '/',
     };
 
@@ -110,6 +110,10 @@ export class AuthController {
   @ApiOperation({ summary: "Récupérer le profil de l'utilisateur connecté" })
   @ApiResponse({ status: 200, description: 'Profil utilisateur' })
   async getProfile(@Request() req) {
+    // Log pour debug
+    console.log('Profile - Request cookies:', req.cookies);
+    console.log('Profile - User from JWT:', req.user);
+
     // Récupérer les données complètes de l'utilisateur depuis la base de données
     const user = await this.authService.getUserProfile(req.user.id);
     return user;
