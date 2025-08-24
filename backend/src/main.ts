@@ -17,9 +17,14 @@ async function bootstrap() {
         process.env.CORS_ORIGIN || 'http://localhost:3000'
       ).split(',');
 
+      console.log('CORS - Request origin:', origin);
+      console.log('CORS - Allowed origins:', allowedOrigins);
+
       if (!origin || allowedOrigins.includes(origin)) {
+        console.log('CORS - Origin allowed');
         callback(null, true);
       } else {
+        console.log('CORS - Origin not allowed:', origin);
         callback(new Error(`Origin ${origin} not allowed by CORS`), false);
       }
     },
