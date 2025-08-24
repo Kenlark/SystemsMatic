@@ -8,10 +8,14 @@ async function bootstrap() {
 
   // Configuration CORS
   app.enableCors({
-    origin: [
-      process.env.CORS_ORIGIN ?? 'http://localhost:3000',
-      'https://systemsmatic.netlify.app/',
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = (process.env.CORS_ORIGIN || '').split(',');
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} not allowed by CORS`), false);
+      }
+    },
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     allowedHeaders: 'Content-Type, Authorization',
     credentials: true,
