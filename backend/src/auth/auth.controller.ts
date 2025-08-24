@@ -35,7 +35,7 @@ export class AuthController {
 
     // Configuration des cookies selon l'environnement
     const cookieOptions: any = {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === 'production', // Visible en dev pour debug
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
@@ -62,7 +62,7 @@ export class AuthController {
   async logout(@Res({ passthrough: true }) res: Response) {
     // Configuration des cookies selon l'environnement
     const cookieOptions: any = {
-      httpOnly: true,
+      httpOnly: process.env.NODE_ENV === 'production', // Visible en dev pour debug
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
