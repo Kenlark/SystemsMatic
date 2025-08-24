@@ -33,14 +33,22 @@ export class AuthController {
   ) {
     const result = await this.authService.login(loginDto);
 
-    // Définir le token dans un cookie HTTP-only
-    res.cookie('access_token', result.access_token, {
+    // Configuration des cookies selon l'environnement
+    const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS en production
-      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
-    });
+    };
+
+    // Ajouter le domaine en production si spécifié
+    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    // Définir le token dans un cookie HTTP-only
+    res.cookie('access_token', result.access_token, cookieOptions);
 
     // Retourner seulement les données utilisateur (sans le token)
     return {
@@ -52,13 +60,21 @@ export class AuthController {
   @ApiOperation({ summary: 'Déconnexion utilisateur' })
   @ApiResponse({ status: 200, description: 'Déconnexion réussie' })
   async logout(@Res({ passthrough: true }) res: Response) {
-    // Supprimer le cookie
-    res.clearCookie('access_token', {
+    // Configuration des cookies selon l'environnement
+    const cookieOptions: any = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
       path: '/',
-    });
+    };
+
+    // Ajouter le domaine en production si spécifié
+    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
+      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    }
+
+    // Supprimer le cookie
+    res.clearCookie('access_token', cookieOptions);
 
     return { message: 'Déconnexion réussie' };
   }
