@@ -40,8 +40,6 @@ export class AuthController {
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
-      domain:
-        process.env.NODE_ENV === 'production' ? '.netlify.app' : undefined, // Domaine partagé pour Netlify
     };
 
     // Log pour debug
@@ -89,8 +87,6 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax', // 'none' pour domaines différents en prod
       path: '/',
-      domain:
-        process.env.NODE_ENV === 'production' ? '.netlify.app' : undefined, // Domaine partagé pour Netlify
     };
 
     // Log pour debug
