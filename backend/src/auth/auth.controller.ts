@@ -37,14 +37,38 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: process.env.NODE_ENV === 'production', // Sécurisé en prod, visible en dev
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax', // Utiliser 'lax' en prod pour éviter les problèmes CORS
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
       path: '/',
     };
 
+    // En production, si les domaines sont différents, utiliser 'none' pour sameSite
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.FRONTEND_DOMAIN &&
+      process.env.BACKEND_DOMAIN
+    ) {
+      const frontendDomain = process.env.FRONTEND_DOMAIN.replace(
+        /^https?:\/\//,
+        '',
+      );
+      const backendDomain = process.env.BACKEND_DOMAIN.replace(
+        /^https?:\/\//,
+        '',
+      );
+
+      if (frontendDomain !== backendDomain) {
+        cookieOptions.sameSite = 'none';
+      }
+    }
+
     // Ajouter le domaine en production si spécifié
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    if (process.env.NODE_ENV === 'production') {
+      if (process.env.COOKIE_DOMAIN) {
+        cookieOptions.domain = process.env.COOKIE_DOMAIN;
+      }
+      // Si pas de domaine spécifié, essayer de le déduire automatiquement
+      // ou laisser le navigateur gérer automatiquement
     }
 
     // Vérifier que le token n'est pas vide avant de le mettre dans le cookie
@@ -69,13 +93,37 @@ export class AuthController {
     const cookieOptions: any = {
       httpOnly: process.env.NODE_ENV === 'production', // Sécurisé en prod, visible en dev
       secure: process.env.NODE_ENV === 'production',
-      sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
+      sameSite: process.env.NODE_ENV === 'production' ? 'lax' : 'lax', // Utiliser 'lax' en prod pour éviter les problèmes CORS
       path: '/',
     };
 
+    // En production, si les domaines sont différents, utiliser 'none' pour sameSite
+    if (
+      process.env.NODE_ENV === 'production' &&
+      process.env.FRONTEND_DOMAIN &&
+      process.env.BACKEND_DOMAIN
+    ) {
+      const frontendDomain = process.env.FRONTEND_DOMAIN.replace(
+        /^https?:\/\//,
+        '',
+      );
+      const backendDomain = process.env.BACKEND_DOMAIN.replace(
+        /^https?:\/\//,
+        '',
+      );
+
+      if (frontendDomain !== backendDomain) {
+        cookieOptions.sameSite = 'none';
+      }
+    }
+
     // Ajouter le domaine en production si spécifié
-    if (process.env.NODE_ENV === 'production' && process.env.COOKIE_DOMAIN) {
-      cookieOptions.domain = process.env.COOKIE_DOMAIN;
+    if (process.env.NODE_ENV === 'production') {
+      if (process.env.COOKIE_DOMAIN) {
+        cookieOptions.domain = process.env.COOKIE_DOMAIN;
+      }
+      // Si pas de domaine spécifié, essayer de le déduire automatiquement
+      // ou laisser le navigateur gérer automatiquement
     }
 
     // Supprimer le cookie
