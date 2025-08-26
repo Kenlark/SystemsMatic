@@ -10,6 +10,15 @@ async function bootstrap() {
   // Middleware pour parser les cookies
   app.use(cookieParser());
 
+  app.use((req: any, res: any, next: any) => {
+    if (process.env.MAINTENANCE_MODE === 'true') {
+      return res.status(503).json({
+        message: 'Service is under maintenance. Please try again later.',
+      });
+    }
+    next();
+  });
+
   // Configuration CORS
   const allowedOrigins =
     process.env.NODE_ENV === 'production'
