@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
+import * as path from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -10,11 +11,11 @@ async function bootstrap() {
   // Middleware pour parser les cookies
   app.use(cookieParser());
 
-  app.use((req: any, res: any, next: any) => {
+  app.use((req, res, next) => {
     if (process.env.MAINTENANCE_MODE === 'true') {
-      return res.status(503).json({
-        message: 'Service is under maintenance. Please try again later.',
-      });
+      return res
+        .status(503)
+        .sendFile(path.join(process.cwd(), 'public', 'maintenance.html'));
     }
     next();
   });

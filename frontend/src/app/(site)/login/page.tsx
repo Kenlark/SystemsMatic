@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { login as apiLogin } from "lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useAuth } from "../contexts/AuthContext";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginForm {
   email: string;
