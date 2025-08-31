@@ -13,17 +13,34 @@ import { ReminderScheduler } from './queues/reminder.scheduler';
 
 function toGuadeloupeTime(date: Date | string): Date {
   const dateObj = new Date(date);
+
+  if (isNaN(dateObj.getTime())) {
+    throw new Error('Date invalide fournie');
+  }
+
+  const guadeloupeString = dateObj.toLocaleString('fr-FR', {
+    timeZone: 'America/Guadeloupe',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+
+  // Créer une nouvelle date à partir de la chaîne formatée
+  const [datePart, timePart] = guadeloupeString.split(' ');
+  const [day, month, year] = datePart.split('/');
+  const [hour, minute, second] = timePart.split(':');
+
   return new Date(
-    dateObj.toLocaleString('fr-FR', {
-      timeZone: 'America/Guadeloupe',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit',
-      hour12: false,
-    }),
+    parseInt(year),
+    parseInt(month) - 1, // Les mois commencent à 0
+    parseInt(day),
+    parseInt(hour),
+    parseInt(minute),
+    parseInt(second),
   );
 }
 

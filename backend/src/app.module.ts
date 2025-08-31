@@ -7,6 +7,7 @@ import { AppointmentsModule } from './appointments/appointments.module';
 import { MailService } from './mail/mail.service';
 import { MailModule } from './mail/mail.module';
 import { QueueModule } from './queue/queue.module';
+import { BackofficeModule } from './backoffice/backoffice.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { QueueModule } from './queue/queue.module';
     AppointmentsModule,
     MailModule,
     QueueModule,
+    BackofficeModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

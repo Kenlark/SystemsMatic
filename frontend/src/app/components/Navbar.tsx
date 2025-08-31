@@ -51,6 +51,14 @@ export default function Navbar() {
                 Contact
               </Link>
             </li>
+            <li className="navbar__nav-item">
+              <Link
+                href="/admin/appointments"
+                className="navbar__nav-link navbar__nav-link--admin"
+              >
+                Admin
+              </Link>
+            </li>
           </ul>
         </div>
       </div>
