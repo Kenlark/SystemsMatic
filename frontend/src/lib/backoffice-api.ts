@@ -60,7 +60,7 @@ export const backofficeApi = {
 
   // Récupérer les statistiques
   getStats: async () => {
-    const response = await backofficeClient.get("/stats");
+    const response = await backofficeClient.get("/appointments/stats");
     return response.data;
   },
 

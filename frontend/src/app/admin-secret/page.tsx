@@ -64,8 +64,13 @@ export default function AdminPage() {
       // Réinitialiser le formulaire
       setEmail("");
       setPassword("");
+
+      showSuccess("Connexion réussie !");
     } catch (error: any) {
-      setAuthError(error.response?.data?.message || "Erreur de connexion");
+      const errorMessage =
+        error.response?.data?.message || "Erreur de connexion";
+      setAuthError(errorMessage);
+      showError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -86,6 +91,7 @@ export default function AdminPage() {
       setAppointments(data);
     } catch (error) {
       console.error("Erreur lors du chargement des rendez-vous:", error);
+      showError("Erreur lors du chargement des rendez-vous");
     } finally {
       setLoading(false);
     }
@@ -97,6 +103,7 @@ export default function AdminPage() {
       setStats(data);
     } catch (error) {
       console.error("Erreur lors du chargement des statistiques:", error);
+      showError("Erreur lors du chargement des statistiques");
     }
   };
 
@@ -112,8 +119,24 @@ export default function AdminPage() {
       });
       fetchAppointments();
       fetchStats();
+
+      // Afficher un toast de succès selon l'action
+      switch (status) {
+        case AppointmentStatus.CONFIRMED:
+          showSuccess("Rendez-vous confirmé avec succès");
+          break;
+        case AppointmentStatus.REJECTED:
+          showSuccess("Rendez-vous rejeté");
+          break;
+        case AppointmentStatus.COMPLETED:
+          showSuccess("Rendez-vous marqué comme terminé");
+          break;
+        default:
+          showSuccess("Statut mis à jour avec succès");
+      }
     } catch (error) {
       console.error("Erreur lors de la mise à jour:", error);
+      showError("Erreur lors de la mise à jour du statut");
     }
   };
 
@@ -123,8 +146,10 @@ export default function AdminPage() {
         await backofficeApi.deleteAppointment(id);
         fetchAppointments();
         fetchStats();
+        showSuccess("Rendez-vous supprimé avec succès");
       } catch (error) {
         console.error("Erreur lors de la suppression:", error);
+        showError("Erreur lors de la suppression du rendez-vous");
       }
     }
   };
@@ -135,6 +160,7 @@ export default function AdminPage() {
       showSuccess("Rappel envoyé avec succès");
     } catch (error) {
       console.error("Erreur lors de l'envoi du rappel:", error);
+      showError("Erreur lors de l'envoi du rappel");
     }
   };
 
@@ -145,6 +171,7 @@ export default function AdminPage() {
       setIsAuthenticated(false);
       setAppointments([]);
       setStats(null);
+      showSuccess("Déconnexion réussie");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
       // Forcer la déconnexion même en cas d'erreur
@@ -152,6 +179,7 @@ export default function AdminPage() {
       setIsAuthenticated(false);
       setAppointments([]);
       setStats(null);
+      showError("Erreur lors de la déconnexion");
     }
   };
 
@@ -261,11 +289,7 @@ export default function AdminPage() {
           <span>
             Connecté en tant que : {user?.firstName} {user?.lastName}
           </span>
-          <button
-            onClick={handleLogout}
-            className="admin-login-button"
-            style={{ marginLeft: "1rem" }}
-          >
+          <button onClick={handleLogout} className="admin-login-button">
             Déconnexion
           </button>
         </div>
@@ -290,22 +314,64 @@ export default function AdminPage() {
 
       {stats && (
         <div className="admin-stats">
-          <div className="stat-card">
+          <div className="stat-card total">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
             <h3>Total</h3>
             <p>{stats.total || 0}</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-card pending">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+              </svg>
+            </div>
             <h3>En attente</h3>
             <p>{stats.pending || 0}</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-card confirmed">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+              </svg>
+            </div>
             <h3>Confirmés</h3>
             <p>{stats.confirmed || 0}</p>
           </div>
-          <div className="stat-card">
+          <div className="stat-card completed">
+            <div className="stat-icon">
+              <svg viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+              </svg>
+            </div>
             <h3>Terminés</h3>
             <p>{stats.completed || 0}</p>
           </div>
+          {stats.cancelled > 0 && (
+            <div className="stat-card cancelled">
+              <div className="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+                </svg>
+              </div>
+              <h3>Annulés</h3>
+              <p>{stats.cancelled}</p>
+            </div>
+          )}
+          {stats.rejected > 0 && (
+            <div className="stat-card rejected">
+              <div className="stat-icon">
+                <svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z" />
+                </svg>
+              </div>
+              <h3>Rejetés</h3>
+              <p>{stats.rejected}</p>
+            </div>
+          )}
         </div>
       )}
 
