@@ -201,6 +201,8 @@ export default function AdminPage() {
         return "En attente";
       case AppointmentStatus.CONFIRMED:
         return "Confirmé";
+      case AppointmentStatus.RESCHEDULED:
+        return "Reprogrammé";
       case AppointmentStatus.CANCELLED:
         return "Annulé";
       case AppointmentStatus.REJECTED:
@@ -218,6 +220,8 @@ export default function AdminPage() {
         return "status-pending";
       case AppointmentStatus.CONFIRMED:
         return "status-confirmed";
+      case AppointmentStatus.RESCHEDULED:
+        return "status-rescheduled";
       case AppointmentStatus.CANCELLED:
         return "status-cancelled";
       case AppointmentStatus.REJECTED:

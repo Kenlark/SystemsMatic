@@ -8,6 +8,7 @@ export enum AppointmentReason {
 export enum AppointmentStatus {
   PENDING = "PENDING",
   CONFIRMED = "CONFIRMED",
+  RESCHEDULED = "RESCHEDULED",
   CANCELLED = "CANCELLED",
   REJECTED = "REJECTED",
   COMPLETED = "COMPLETED",

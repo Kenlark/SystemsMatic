@@ -280,6 +280,10 @@
   border-left: 4px solid #10b981;
 }
 
+.appointment-card.status-rescheduled {
+  border-left: 4px solid #8b5cf6;
+}
+
 .appointment-card.status-cancelled {
   border-left: 4px solid #ef4444;
 }

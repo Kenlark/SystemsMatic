@@ -128,7 +128,7 @@ export class MailService {
       <p>Bonjour ${appt.contact.firstName},</p>
       <p>Nous vous proposons de reprogrammer votre rendez-vous au <b>${date}</b>.</p>
       <p>Pour confirmer cette nouvelle date : <a href="${process.env.PUBLIC_URL}/appointments/${appt.id}/confirm?token=${appt.confirmationToken}">Confirmer</a></p>
-      <p>Pour refuser et annuler : <a href="${process.env.PUBLIC_URL}/appointments/${appt.id}/cancel?token=${appt.cancellationToken}">Annuler</a></p>
+      <p>Pour refuser et annuler : <a href="${process.env.PUBLIC_URL}/appointments/${appt.id}/cancel?token=${appt.cancellationToken}">Refuser</a></p>
       <p>Si vous refusez, vous devrez prendre un nouveau rendez-vous manuellement.</p>
     `;
     await this.send(to, subject, html);
