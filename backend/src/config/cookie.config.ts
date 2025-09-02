@@ -12,7 +12,7 @@ export const getCookieOptions = (isProduction: boolean): CookieOptions => {
   return {
     httpOnly: true,
     secure: forceProduction,
-    sameSite: forceProduction ? 'none' : 'strict',
+    sameSite: 'none',
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 jours
     path: '/',
     domain: forceProduction ? '.systemsmatic.com' : undefined,
@@ -28,7 +28,7 @@ export const getClearCookieOptions = (isProduction: boolean): CookieOptions => {
   return {
     path: '/',
     secure: forceProduction,
-    sameSite: forceProduction ? 'none' : 'strict',
+    sameSite: 'none',
     domain: forceProduction ? '.systemsmatic.com' : undefined,
   };
 };
