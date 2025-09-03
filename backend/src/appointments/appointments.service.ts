@@ -561,33 +561,33 @@ export class AppointmentsService {
     }
 
     // Validation des contraintes de reprogrammation
-    const proposedDate = new Date(newScheduledAt);
-    const now = new Date();
+    // Utiliser dayjs pour interpréter l'heure locale correctement
+    const proposedDate = dayjs.tz(newScheduledAt, 'America/Guadeloupe');
+    const now = dayjs();
+
+    if (!proposedDate.isValid()) {
+      throw new BadRequestException('Date invalide reçue');
+    }
 
     // Vérifier qu'il y a au moins 24h d'avance
-    const timeDifference = proposedDate.getTime() - now.getTime();
-    const hoursDifference = timeDifference / (1000 * 60 * 60);
+    const timeDifference = proposedDate.diff(now, 'hour');
 
-    if (hoursDifference < 24) {
+    if (timeDifference < 24) {
       throw new BadRequestException(
         "La reprogrammation doit être proposée au moins 24h à l'avance",
       );
     }
 
     // Vérifier que l'heure est dans les créneaux autorisés (8h-17h)
-    const hour = proposedDate.getHours();
-    if (
-      hour < 8 ||
-      hour > 17 ||
-      (hour === 17 && proposedDate.getMinutes() > 0)
-    ) {
+    const hour = proposedDate.hour();
+    if (hour < 8 || hour > 17 || (hour === 17 && proposedDate.minute() > 0)) {
       throw new BadRequestException(
         'Les créneaux autorisés sont entre 8h et 17h',
       );
     }
 
     // Vérifier que les minutes sont 0 ou 30
-    const minutes = proposedDate.getMinutes();
+    const minutes = proposedDate.minute();
     if (minutes !== 0 && minutes !== 30) {
       throw new BadRequestException(
         "Les créneaux doivent être à l'heure pile ou à la demi-heure",
@@ -598,7 +598,7 @@ export class AppointmentsService {
     const updated = await this.prisma.appointment.update({
       where: { id },
       data: {
-        scheduledAt: new Date(newScheduledAt),
+        scheduledAt: proposedDate.toDate(),
         status: AppointmentStatus.RESCHEDULED,
         confirmedAt: new Date(),
       },

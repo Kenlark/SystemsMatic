@@ -57,7 +57,7 @@ export default function AdminDateTimePicker({
   const updateDateTime = useCallback(
     (date: string, time: string) => {
       if (date && time) {
-        const combinedDateTime = `${date}T${time}`;
+        const combinedDateTime = `${date}T${time}:00.000`;
         onChange(combinedDateTime);
       } else {
         onChange("");
