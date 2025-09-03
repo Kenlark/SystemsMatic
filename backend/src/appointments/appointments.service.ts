@@ -103,7 +103,10 @@ export class AppointmentsService {
     const { scheduledAt } = dto;
     const appointment = await this.findOneAdmin(id);
 
-    if (appointment.status !== AppointmentStatus.PENDING) {
+    if (
+      appointment.status !== AppointmentStatus.PENDING &&
+      appointment.status !== AppointmentStatus.RESCHEDULED
+    ) {
       throw new BadRequestException(
         'Le rendez-vous ne peut pas être confirmé dans son état actuel',
       );
