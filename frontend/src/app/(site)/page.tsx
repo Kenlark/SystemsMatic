@@ -5,6 +5,7 @@ import axios from "axios";
 import AppointmentForm from "../../components/AppointmentForm";
 import { appointmentService } from "../../lib/api";
 import { CreateAppointmentDto } from "../../types/appointment";
+import ChatBox from "../../components/ChatBox";
 
 export default function Home() {
   const [isFormSubmitted, setIsFormSubmitted] = useState(false);
@@ -158,6 +159,7 @@ export default function Home() {
           </div>
         )}
       </div>
+      <ChatBox />
     </div>
   );
 }
