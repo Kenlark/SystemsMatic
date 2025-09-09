@@ -98,7 +98,7 @@ export default function ChatBox() {
         setIsTyping(false);
         if (callback) callback();
       }
-    }, 30); // Vitesse de frappe réaliste
+    }, 10);
   };
 
   // Initialiser avec le message de bienvenue
@@ -177,11 +177,11 @@ export default function ChatBox() {
                 setMessages((prev) => [...prev, newOptionsMessage]);
               }
               setStep(nextStep.next || "start");
-            }, 2000);
+            }, 1000);
           });
-        }, 1000); // Délai avant de commencer à taper
+        }, 100); // Délai avant de commencer à taper
       }
-    }, 800); // Délai de "réflexion"
+    }, 400);
   };
 
   const toggleChat = () => {
