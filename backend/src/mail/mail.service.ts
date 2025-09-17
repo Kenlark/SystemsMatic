@@ -62,7 +62,7 @@ export class MailService {
 
   /**
    * Formate une date pour l'affichage dans les emails
-   * @param date Date à formater
+   * @param date Date à formater (toutes les dates sont maintenant en UTC depuis la base)
    * @param timezone Timezone d'affichage
    * @returns Date formatée ou "—" si nulle
    */
@@ -71,7 +71,8 @@ export class MailService {
     timezone: string = EMAIL_TIMEZONE,
   ): string {
     if (!date) return '—';
-    return dayjs(date).tz(timezone).format(EMAIL_CONFIG.DATE_FORMAT);
+    // Toutes les dates venant de la base sont en UTC
+    return dayjs.utc(date).tz(timezone).format(EMAIL_CONFIG.DATE_FORMAT);
   }
 
   /**
@@ -98,7 +99,11 @@ export class MailService {
     contact: Contact,
     appointment: Appointment,
   ): Promise<void> {
-    const requestedDate = this.formatDate(appointment.requestedAt);
+    // Pour requestedAt, utiliser la timezone de l'utilisateur stockée avec le rendez-vous
+    const requestedDate = this.formatDate(
+      appointment.requestedAt,
+      appointment.timezone,
+    );
     const cancelUrl = this.generateActionUrl(
       appointment.id,
       'cancel',

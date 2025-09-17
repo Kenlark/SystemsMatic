@@ -763,7 +763,7 @@ export class AppointmentsService {
    * Traite la date demandée avec timezone
    * @param requestedAt Date demandée
    * @param timezone Timezone utilisateur
-   * @returns Date traitée
+   * @returns Date traitée pour stockage en UTC
    */
   private processRequestedDate(
     requestedAt: string | Date,
@@ -776,6 +776,7 @@ export class AppointmentsService {
         throw new BadRequestException('Date invalide reçue');
       }
 
+      // La date vient avec son offset timezone du frontend
       return dateWithOffset.toDate();
     }
 
