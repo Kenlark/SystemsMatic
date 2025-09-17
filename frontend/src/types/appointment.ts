@@ -23,6 +23,7 @@ export interface CreateAppointmentDto {
   reasonOther?: string;
   message?: string;
   requestedAt: string;
+  timezone: string;
   consent: boolean;
 }
 

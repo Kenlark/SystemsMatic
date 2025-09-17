@@ -36,6 +36,7 @@ export class AppointmentsService {
       reasonOther,
       message,
       requestedAt,
+      timezone,
       consent,
     } = dto;
 
@@ -61,20 +62,21 @@ export class AppointmentsService {
     const confirmationToken = this.generateToken();
     const cancellationToken = this.generateToken();
 
-    // Traiter requestedAt comme une heure locale sélectionnée
+    // Traiter requestedAt comme une heure dans la timezone de l'utilisateur
     let processedRequestedAt: Date;
 
     if (typeof requestedAt === 'string') {
-      // Utiliser dayjs pour interpréter l'heure locale correctement
-      const guadeloupeTime = dayjs.tz(requestedAt, 'America/Guadeloupe');
+      // Utiliser la timezone fournie par l'utilisateur
+      const userTimezone = timezone || GUADELOUPE_TIMEZONE;
+      const userTime = dayjs.tz(requestedAt, userTimezone);
 
       // Vérifier que la date est valide
-      if (!guadeloupeTime.isValid()) {
+      if (!userTime.isValid()) {
         throw new BadRequestException('Date invalide reçue');
       }
 
       // Convertir en Date JavaScript (sera stockée en UTC dans la BDD)
-      processedRequestedAt = guadeloupeTime.toDate();
+      processedRequestedAt = userTime.toDate();
     } else {
       processedRequestedAt = requestedAt;
     }
@@ -87,6 +89,7 @@ export class AppointmentsService {
         reasonOther,
         message,
         requestedAt: processedRequestedAt,
+        timezone: timezone || GUADELOUPE_TIMEZONE,
         confirmationToken,
         cancellationToken,
       },

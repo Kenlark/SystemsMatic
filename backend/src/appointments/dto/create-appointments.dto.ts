@@ -25,6 +25,11 @@ export class CreateAppointmentDto {
   @IsDateString()
   @IsValidBookingDate()
   requestedAt: string;
+
+  @IsString()
+  @IsNotEmpty()
+  timezone: string;
+
   @IsOptional()
   @IsInt({ message: 'requestedDurationMin must be an integer number' })
   @Min(15, { message: 'requestedDurationMin must not be less than 15' })

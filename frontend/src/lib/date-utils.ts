@@ -11,6 +11,37 @@ dayjs.locale("fr");
 
 const GUADELOUPE_TIMEZONE = "America/Guadeloupe";
 
+/**
+ * Détecte la timezone du navigateur de l'utilisateur
+ */
+export const getUserTimezone = (): string => {
+  return Intl.DateTimeFormat().resolvedOptions().timeZone;
+};
+
+/**
+ * Obtient le nom lisible de la timezone de l'utilisateur
+ */
+export const getUserTimezoneDisplayName = (): string => {
+  const timezone = getUserTimezone();
+  const now = new Date();
+
+  try {
+    const formatter = new Intl.DateTimeFormat("fr-FR", {
+      timeZone: timezone,
+      timeZoneName: "long",
+    });
+
+    const parts = formatter.formatToParts(now);
+    const timeZoneName = parts.find(
+      (part) => part.type === "timeZoneName"
+    )?.value;
+
+    return timeZoneName || timezone;
+  } catch (error) {
+    return timezone;
+  }
+};
+
 // Créneaux horaires disponibles
 const MORNING_START = 8; // 8h
 const MORNING_END = 12; // 12h
@@ -182,14 +213,16 @@ export const getAvailableTimeSlots = (date: string | Date) => {
 
 /**
  * Convertit une date sélectionnée en UTC pour stockage (bonne pratique)
- * L'utilisateur sélectionne une heure "intention Guadeloupe" qu'on stocke en UTC
+ * L'utilisateur sélectionne une heure dans sa timezone locale qu'on stocke en UTC
  */
-export const convertToUTC = (date: string | Date) => {
+export const convertToUTC = (date: string | Date, userTimezone?: string) => {
+  const timezone = userTimezone || getUserTimezone();
+
   if (typeof date === "string") {
-    return dayjs.tz(date, GUADELOUPE_TIMEZONE).utc().toISOString();
+    return dayjs.tz(date, timezone).utc().toISOString();
   }
 
-  // Traiter la sélection comme une "intention heure Guadeloupe"
+  // Traiter la sélection comme une heure dans la timezone de l'utilisateur
   const dateString = `${date.getFullYear()}-${(date.getMonth() + 1)
     .toString()
     .padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")} ${date
@@ -200,8 +233,8 @@ export const convertToUTC = (date: string | Date) => {
     .toString()
     .padStart(2, "0")}`;
 
-  const guadeloupeTime = dayjs.tz(dateString, GUADELOUPE_TIMEZONE);
-  return guadeloupeTime.utc().toISOString();
+  const userTime = dayjs.tz(dateString, timezone);
+  return userTime.utc().toISOString();
 };
 
 /**

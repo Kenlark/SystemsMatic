@@ -17,23 +17,31 @@ const GUADELOUPE_TIMEZONE = 'America/Guadeloupe';
 export class IsValidBookingDateConstraint
   implements ValidatorConstraintInterface
 {
-  validate(dateString: string) {
+  validate(dateString: string, args: any) {
     if (!dateString) return false;
 
     try {
-      // Convertir la date UTC reçue en heure Guadeloupe
-      const appointmentDate = dayjs.utc(dateString).tz(GUADELOUPE_TIMEZONE);
+      // Récupérer la timezone depuis l'objet parent (CreateAppointmentDto)
+      const timezone = args.object?.timezone || GUADELOUPE_TIMEZONE;
+
+      // Convertir la date reçue en utilisant la timezone de l'utilisateur
+      const appointmentDate = dayjs.tz(dateString, timezone);
       const now = dayjs().tz(GUADELOUPE_TIMEZONE);
 
-      // Date minimale : demain
+      // Date minimale : demain en Guadeloupe
       const minDate = now.add(1, 'day').hour(0).minute(0).second(0);
 
-      // Date maximale : dans 1 mois
+      // Date maximale : dans 1 mois en Guadeloupe
       const maxDate = now.add(1, 'month').hour(23).minute(59).second(59);
+
+      // Convertir les dates limites en timezone de l'utilisateur pour comparaison
+      const minDateInUserTz = minDate.tz(timezone);
+      const maxDateInUserTz = maxDate.tz(timezone);
 
       // Vérifier que la date est dans la plage autorisée
       return (
-        appointmentDate.isAfter(minDate) && appointmentDate.isBefore(maxDate)
+        appointmentDate.isAfter(minDateInUserTz) &&
+        appointmentDate.isBefore(maxDateInUserTz)
       );
     } catch (error) {
       return false;
@@ -41,7 +49,7 @@ export class IsValidBookingDateConstraint
   }
 
   defaultMessage() {
-    return "La date de rendez-vous doit être comprise entre demain et un mois à partir d'aujourd'hui";
+    return "La date de rendez-vous doit être comprise entre demain et un mois à partir d'aujourd'hui (heure de Guadeloupe)";
   }
 }
 

@@ -8,6 +8,8 @@ import {
   getCurrentGuadeloupeTime,
   getMinimumBookingDate,
   convertToUTC,
+  getUserTimezone,
+  getUserTimezoneDisplayName,
 } from "../lib/date-utils";
 import "../app/styles/appointment-form.css";
 import "../app/styles/native-datetime-picker.css";
@@ -38,6 +40,7 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
       reasonOther: "",
       message: "",
       requestedAt: "",
+      timezone: getUserTimezone(),
       consent: false,
     },
   });
@@ -74,6 +77,7 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
         phone: data.phone || undefined,
         message: data.message || undefined,
         requestedAt: data.requestedAt,
+        timezone: data.timezone || getUserTimezone(),
       };
 
       await onSubmit(cleanedData);
@@ -175,6 +179,10 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
           délai maximum d'1 mois). Créneaux disponibles : 8h-12h et 14h-17h
           (toutes les 30 minutes). Nous vous confirmerons la disponibilité et
           vous proposerons un horaire définitif.
+        </p>
+        <p className="form-help timezone-info">
+          <strong>Votre timezone détectée :</strong>{" "}
+          {getUserTimezoneDisplayName()}
         </p>
       </div>
 

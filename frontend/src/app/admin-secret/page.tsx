@@ -192,11 +192,17 @@ export default function AdminPage() {
     }
   };
 
-  const formatDate = (date: string | Date) => {
+  const formatDate = (date: string | Date, timezone?: string) => {
+    if (timezone) {
+      return dayjs.utc(date).tz(timezone).format("DD/MM/YYYY HH:mm");
+    }
     return formatGuadeloupeDateTime(date);
   };
 
-  const formatRequestedDate = (date: string | Date) => {
+  const formatRequestedDate = (date: string | Date, timezone?: string) => {
+    if (timezone) {
+      return dayjs.utc(date).tz(timezone).format("DD/MM/YYYY HH:mm");
+    }
     return formatGuadeloupeDateTime(date);
   };
 
@@ -432,12 +438,18 @@ export default function AdminPage() {
                     </p>
                     <p>
                       <strong>Demandé le :</strong>{" "}
-                      {formatRequestedDate(appointment.requestedAt)}
+                      {formatRequestedDate(
+                        appointment.requestedAt,
+                        appointment.timezone
+                      )}
                     </p>
                     {appointment.scheduledAt && (
                       <p>
                         <strong>Programmé le :</strong>{" "}
-                        {formatDate(appointment.scheduledAt)}
+                        {formatDate(
+                          appointment.scheduledAt,
+                          appointment.timezone
+                        )}
                       </p>
                     )}
                     <p>
