@@ -1,6 +1,17 @@
 import axios from "axios";
 import { CreateAppointmentDto } from "../types/appointment";
 
+// Types pour les devis
+export interface CreateQuoteDto {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  message: string;
+  acceptPhone: boolean;
+  acceptTerms: boolean;
+}
+
 // Configuration de base d'axios
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001",
@@ -31,6 +42,15 @@ export const appointmentService = {
     const response = await api.get(`/appointments/${id}/cancel`, {
       params: { token },
     });
+    return response.data;
+  },
+};
+
+// Service pour les devis
+export const quoteService = {
+  // Créer une nouvelle demande de devis
+  create: async (data: CreateQuoteDto) => {
+    const response = await api.post("/quotes", data);
     return response.data;
   },
 };

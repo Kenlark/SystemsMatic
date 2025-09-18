@@ -95,7 +95,7 @@
   margin: 0;
 }
 
-/* Couleurs spécifiques pour chaque statut */
+
 .stat-card.total {
   border-left-color: #6366f1;
   background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
@@ -150,7 +150,7 @@
   color: #7c3aed;
 }
 
-/* Icônes des statistiques */
+
 .stat-icon {
   position: absolute;
   top: 1rem;
@@ -166,7 +166,7 @@
   height: 100%;
 }
 
-/* Indicateur de tendance */
+
 .stat-card::before {
   content: "";
   position: absolute;
@@ -179,7 +179,7 @@
   border-color: transparent transparent rgba(0, 0, 0, 0.05) transparent;
 }
 
-/* Contenu principal */
+
 .admin-content {
   max-width: 80rem;
   margin: 0 auto;
@@ -189,7 +189,7 @@
   overflow: hidden;
 }
 
-/* Sélecteur de date/heure */
+
 .date-picker-overlay {
   position: fixed;
   top: 0;
@@ -246,7 +246,7 @@
   justify-content: flex-end;
 }
 
-/* Liste des rendez-vous */
+
 .appointments-list {
   padding: 1.5rem;
 }
@@ -258,7 +258,7 @@
   padding: 3rem 1rem;
 }
 
-/* Carte de rendez-vous */
+
 .appointment-card {
   border: 1px solid #e5e7eb;
   border-radius: 0.5rem;
@@ -429,7 +429,7 @@
   background-color: #4b5563;
 }
 
-/* États de chargement */
+
 .admin-loading {
   display: flex;
   align-items: center;
@@ -463,7 +463,7 @@
   }
 }
 
-/* Page de connexion admin */
+
 .admin-login {
   min-height: 100vh;
   display: flex;
@@ -518,7 +518,7 @@
   cursor: pointer;
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .admin-header {
     flex-direction: column;
@@ -551,7 +551,7 @@
   }
 }
 
-/* Styles pour AdminDateTimePicker */
+
 .admin-datetime-picker {
   background: white;
   padding: 1.5rem;
@@ -670,7 +670,7 @@
   background: #dc2626;
 }
 
-/* Responsive */
+
 @media (max-width: 640px) {
   .admin-datetime-picker .datetime-inputs {
     flex-direction: column;

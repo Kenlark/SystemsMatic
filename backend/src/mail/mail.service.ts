@@ -91,6 +91,16 @@ export class MailService {
   }
 
   /**
+   * Envoie un email générique
+   * @param to Destinataire
+   * @param subject Sujet
+   * @param html Contenu HTML
+   */
+  async sendEmail(to: string, subject: string, html: string): Promise<void> {
+    await this.send(to, subject, html);
+  }
+
+  /**
    * Envoie un email de confirmation de demande de rendez-vous
    * @param contact Informations du contact
    * @param appointment Détails du rendez-vous demandé

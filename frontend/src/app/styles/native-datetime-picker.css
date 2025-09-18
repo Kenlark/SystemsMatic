@@ -1,4 +1,4 @@
-/* Styles pour le composant NativeDateTimePicker */
+
 .native-datetime-picker {
   width: 100%;
 }
@@ -70,7 +70,7 @@
   text-align: center;
 }
 
-/* Responsive */
+
 @media (max-width: 640px) {
   .datetime-inputs {
     flex-direction: column;
@@ -83,7 +83,7 @@
   }
 }
 
-/* Style pour les navigateurs qui supportent les custom date inputs */
+
 .date-input::-webkit-calendar-picker-indicator {
   cursor: pointer;
   filter: invert(0.5);
@@ -93,13 +93,13 @@
   filter: invert(0.3);
 }
 
-/* Style pour les dates en dehors de la plage autorisée */
+
 .date-input:invalid {
   border-color: #f59e0b;
   background-color: #fef3c7;
 }
 
-/* Message d'info sur les contraintes */
+
 .date-constraints-info {
   font-size: 0.75rem;
   color: #6b7280;
@@ -107,7 +107,7 @@
   font-style: italic;
 }
 
-/* Amélioration du style des selects */
+
 .time-select {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");

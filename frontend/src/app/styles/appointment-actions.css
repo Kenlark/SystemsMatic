@@ -1,4 +1,4 @@
-/* Styles pour les pages d'actions sur les rendez-vous */
+
 
 .appointment-action-container {
   min-height: 100vh;
@@ -23,7 +23,7 @@
   text-align: center;
 }
 
-/* Spinner de chargement */
+
 .loading-spinner {
   width: 3rem;
   height: 3rem;
@@ -43,7 +43,7 @@
   }
 }
 
-/* Icônes de succès et d'erreur */
+
 .success-icon {
   width: 3rem;
   height: 3rem;
@@ -72,7 +72,7 @@
   margin: 0 auto 1rem auto;
 }
 
-/* Titres et messages */
+
 .appointment-action-title {
   font-size: 1.25rem;
   font-weight: 600;
@@ -86,7 +86,7 @@
   line-height: 1.5;
 }
 
-/* Bouton de retour */
+
 .appointment-action-button {
   display: inline-block;
   background-color: #3b82f6;
@@ -108,7 +108,7 @@
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Responsive */
+
 @media (max-width: 640px) {
   .appointment-action-card {
     margin: 1rem;

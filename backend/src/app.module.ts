@@ -9,6 +9,7 @@ import { MailModule } from './mail/mail.module';
 import { QueueModule } from './queue/queue.module';
 import { BackofficeModule } from './backoffice/backoffice.module';
 import { AuthModule } from './auth/auth.module';
+import { QuotesModule } from './quotes/quotes.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { AuthModule } from './auth/auth.module';
     QueueModule,
     BackofficeModule,
     AuthModule,
+    QuotesModule,
   ],
   controllers: [AppController],
   providers: [AppService, MailService],

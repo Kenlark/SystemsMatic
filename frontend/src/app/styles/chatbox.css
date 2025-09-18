@@ -27,7 +27,7 @@
   transform: scale(0.95);
 }
 
-/* Animation de pulsation pour attirer l'attention */
+
 @keyframes pulse {
   0% {
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
@@ -115,7 +115,7 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-/* Messages */
+
 .chatbox__messages {
   max-height: 600px;
   overflow-y: auto;
@@ -199,7 +199,7 @@
   color: #94a3b8;
 }
 
-/* Indicateur de frappe */
+
 .typing-indicator {
   display: flex;
   gap: 4px;
@@ -236,7 +236,7 @@
   }
 }
 
-/* Styles pour les options dans les messages */
+
 .message__options {
   display: flex;
   flex-direction: column;
@@ -282,7 +282,7 @@
   transform: none;
 }
 
-/* Styles spécifiques pour les options côté utilisateur */
+
 .message--user-options .message__option-btn {
   background: #f0f9ff;
   border-color: #0ea5e9;
@@ -336,7 +336,7 @@
   transform: translateY(0);
 }
 
-/* Responsive */
+
 @media (max-width: 768px) {
   .chat-icon {
     bottom: 15px;
@@ -393,7 +393,7 @@
   }
 }
 
-/* Animation d'entrée */
+
 @keyframes slideInUp {
   from {
     transform: translateY(100%);
@@ -405,7 +405,7 @@
   }
 }
 
-/* Animation de sortie */
+
 @keyframes slideOutDown {
   from {
     transform: translateY(0);
