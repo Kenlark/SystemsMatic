@@ -1,14 +1,10 @@
 "use client";
 
-import { useState } from "react";
 import AppointmentSection from "../../components/AppointmentSection";
 import ChatBox from "../../components/ChatBox";
 import QuoteForm from "../../components/QuoteForm";
 
 export default function Home() {
-  const [showPhone, setShowPhone] = useState(false);
-  const phone = process.env.NEXT_PUBLIC_BUSINESS_PHONE || "0590 00 00 00";
-  const sanitizedPhone = phone.replace(/\s/g, "");
   return (
     <div className="home-container">
       {/* Hero Section */}
@@ -78,35 +74,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
-        <div className="container">
-          <div className="cta-bar">
-            {!showPhone ? (
-              <button className="cta-pill" onClick={() => setShowPhone(true)}>
-                Afficher numéro
-              </button>
-            ) : (
-              <a className="cta-pill primary" href={`tel:${sanitizedPhone}`}>
-                Appeler {phone}
-              </a>
-            )}
-            <button
-              className="cta-pill primary"
-              onClick={() =>
-                document
-                  .getElementById("quote-form")
-                  ?.scrollIntoView({ behavior: "smooth" })
-              }
-            >
-              Recevoir mon devis gratuit
-            </button>
-            <span className="cta-pill">Réponse rapide</span>
-          </div>
-        </div>
-      </section>
-
       {/* Services Section */}
-      <section className="services-section">
+      <section id="services" className="services-section">
         <div className="container">
           <div className="services-header">
             <h2 className="heading-2 services-title">Nos Services</h2>
@@ -197,7 +166,7 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section">
+      <section id="about" className="section">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Notre entreprise</h2>
@@ -264,15 +233,9 @@ export default function Home() {
             <p className="section-subtitle">Guadeloupe et alentours</p>
           </div>
           <div className="contact-cta">
-            {!showPhone ? (
-              <button className="cta-pill" onClick={() => setShowPhone(true)}>
-                Afficher numéro
-              </button>
-            ) : (
-              <a className="cta-pill primary" href={`tel:${sanitizedPhone}`}>
-                Appeler {phone}
-              </a>
-            )}
+            <a className="cta-pill primary" href="#quote-form">
+              Demander un devis
+            </a>
             <button
               className="cta-pill primary"
               onClick={() =>
@@ -283,12 +246,9 @@ export default function Home() {
             >
               Recevoir mon devis gratuit
             </button>
-            <span className="cta-pill">Réponse rapide</span>
           </div>
         </div>
       </section>
-
-      <div className="section-divider"></div>
 
       {/* Appointment Section */}
       <section className="form-section">
@@ -296,8 +256,6 @@ export default function Home() {
           <AppointmentSection />
         </div>
       </section>
-
-      <div className="section-divider"></div>
 
       {/* Quote Section */}
       <section className="form-section">

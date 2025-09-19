@@ -1,4 +1,3 @@
-
 .quote-section {
   margin-top: var(--spacing-2xl);
 }
@@ -11,7 +10,6 @@
   overflow: hidden;
   border: 1px solid var(--color-border-subtle);
 }
-
 
 .quote-form .form-label {
   color: var(--color-text-primary);
@@ -40,7 +38,11 @@
 }
 
 .quote-form-header {
-  background: var(--color-bg-accent);
+  background: linear-gradient(
+    135deg,
+    var(--color-bg-primary) 0%,
+    var(--color-bg-secondary) 100%
+  );
   padding: var(--spacing-xl);
   text-align: center;
   border-bottom: 1px solid #f1f5f9;
@@ -54,7 +56,7 @@
 }
 
 .form-checkboxes {
-  background: var(--color-bg-subtle);
+  background: var(--color-bg-primary);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--spacing-lg);
@@ -72,7 +74,6 @@
 .form-submit:hover .quote-icon {
   transform: translateX(2px);
 }
-
 
 .quote-success-container {
   text-align: center;
@@ -146,7 +147,6 @@
   box-shadow: var(--shadow-md);
 }
 
-
 .cta-section {
   text-align: center;
   margin: var(--spacing-2xl) 0;
@@ -204,11 +204,9 @@
   transform: translateY(1px);
 }
 
-
 html {
   scroll-behavior: smooth;
 }
-
 
 @media (max-width: 768px) {
   .quote-form-container,

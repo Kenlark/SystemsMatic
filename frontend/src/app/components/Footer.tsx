@@ -7,10 +7,12 @@ export default function Footer() {
         <div className="footer__content">
           {/* Section principale */}
           <div className="footer__section">
-            <h3 className="footer__title">System's Matic</h3>
+            <h3 className="footer__title">
+              <img src="/images/logo.jpg" alt="System's Matic" />
+            </h3>
             <p className="footer__description">
-              Votre partenaire de confiance pour des solutions technologiques
-              innovantes et performantes.
+              Spécialiste en automatismes : portes, portails, volets.
+              Contactez-nous pour vos projets en Guadeloupe.
             </p>
             <div className="footer__social">
               <a href="#" className="footer__social-link" aria-label="Facebook">
@@ -53,18 +55,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/services" className="footer__link">
+                <Link href="#services" className="footer__link">
                   Services
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/about" className="footer__link">
+                <Link href="#about" className="footer__link">
                   À propos
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/contact" className="footer__link">
-                  Contact
+                <Link href="#appointment-form" className="footer__link">
+                  Prendre rendez-vous
                 </Link>
               </li>
             </ul>
@@ -75,23 +77,23 @@ export default function Footer() {
             <h4 className="footer__subtitle">Services</h4>
             <ul className="footer__links">
               <li className="footer__link-item">
-                <Link href="/services/development" className="footer__link">
-                  Développement web
+                <Link href="#services" className="footer__link">
+                  Prestations
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/services/mobile" className="footer__link">
-                  Applications mobiles
+                <Link href="#services" className="footer__link">
+                  Automatismes
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/services/consulting" className="footer__link">
-                  Conseil IT
+                <Link href="#services" className="footer__link">
+                  Autres Produits
                 </Link>
               </li>
               <li className="footer__link-item">
-                <Link href="/services/maintenance" className="footer__link">
-                  Maintenance
+                <Link href="#services" className="footer__link">
+                  Accessibilité
                 </Link>
               </li>
             </ul>
@@ -144,7 +146,7 @@ export default function Footer() {
         <div className="footer__bottom">
           <div className="footer__copyright">
             <p className="footer__copyright-text">
-              © 2024 System's Matic. Tous droits réservés.
+              © 2025 System's Matic. Tous droits réservés.
             </p>
           </div>
           <div className="footer__legal">

@@ -29,6 +29,11 @@
   color: #ffffff;
 }
 
+.footer__title img {
+  height: 45px;
+  width: auto;
+}
+
 .footer__description {
   color: #d1d5db;
   margin-bottom: 1.5rem;

@@ -65,7 +65,7 @@
 .hero-cta {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-lg);
+  gap: var(--spacing-md);
   align-items: center;
   position: relative;
 }
@@ -90,7 +90,8 @@
   z-index: 0;
 }
 
-.hero-buttons > * {
+.hero-buttons > *,
+.hero-cta-pills > * {
   position: relative;
   z-index: 1;
 }
@@ -280,19 +281,13 @@
 
 .section-divider {
   height: 1px;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    var(--color-border) 20%,
-    var(--color-border) 80%,
-    transparent 100%
-  );
+
   margin: var(--spacing-2xl) 0;
 }
 
 .form-section {
+  background: var(--color-bg-primary);
   padding: var(--spacing-3xl) 0;
-  background: var(--color-bg-secondary);
 }
 
 .form-container {
@@ -313,6 +308,16 @@
   flex-wrap: wrap;
 }
 
+/* CTA Pills dans la section hero */
+.hero-cta-pills {
+  display: flex;
+  gap: var(--spacing-md);
+  justify-content: center;
+  align-items: center;
+  margin-top: var(--spacing-lg);
+  flex-wrap: wrap;
+}
+
 .cta-pill {
   display: inline-flex;
   align-items: center;
@@ -325,6 +330,7 @@
   text-decoration: none;
   font-weight: 500;
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .cta-pill:hover {
