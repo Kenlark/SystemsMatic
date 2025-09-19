@@ -122,6 +122,7 @@
   border-color: var(--color-primary-dark);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  cursor: pointer;
 }
 
 .hero-btn-secondary {
@@ -136,6 +137,7 @@
   border-color: var(--color-border-strong);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
+  cursor: pointer;
 }
 
 .services-section {
@@ -187,13 +189,8 @@
   border-color: var(--color-border);
 }
 
-.service-card:hover .service-icon {
-  background: var(--color-primary-light);
-}
-
 .service-card:hover .service-icon svg {
-  color: var(--color-primary);
-  transform: scale(1.05);
+  transform: scale(1.1);
 }
 
 .service-icon {
@@ -334,6 +331,7 @@
   background: var(--color-bg-accent);
   border-color: var(--color-border-strong);
   transform: translateY(-1px);
+  cursor: pointer;
 }
 
 .cta-pill.primary {

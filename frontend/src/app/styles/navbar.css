@@ -1,9 +1,8 @@
-
 .navbar {
-  background: color-mix(in srgb, var(--color-bg-primary) 95%, transparent);
+  background: color-mix(in srgb, var(--color-bg-primary) 90%, transparent);
   backdrop-filter: blur(10px);
   border-bottom: 1px solid
-    color-mix(in srgb, var(--color-border-subtle) 80%, transparent);
+    color-mix(in srgb, var(--color-border-subtle) 60%, transparent);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -94,27 +93,6 @@
   background: var(--color-primary-light);
 }
 
-
-.navbar__nav-link::after {
-  content: "";
-  position: absolute;
-  left: var(--spacing-md);
-  right: calc(100% - var(--spacing-md));
-  bottom: 6px;
-  height: 2px;
-  background: var(--color-primary);
-  border-radius: 1px;
-  opacity: 0;
-  transform: translateY(4px);
-  transition: all var(--transition-fast);
-}
-
-.navbar__nav-link:hover::after {
-  right: var(--spacing-md);
-  opacity: 1;
-  transform: translateY(0);
-}
-
 .navbar__nav-link[aria-current="page"],
 .navbar__nav-link.active {
   color: var(--color-primary);
@@ -182,7 +160,6 @@
   transform: rotate(-45deg) translate(5px, -5px);
 }
 
-
 .navbar__actions {
   display: flex;
   align-items: center;
@@ -216,7 +193,6 @@
   width: 14px;
   height: 14px;
 }
-
 
 @media (max-width: 768px) {
   .navbar__mobile-toggle {
@@ -261,12 +237,10 @@
     width: 100%;
     padding: var(--spacing-md);
     text-align: center;
-    border: 1px solid transparent;
     border-radius: var(--radius-sm);
   }
 
   .navbar__nav-link:hover {
-    border-color: var(--color-primary-light);
     background: var(--color-primary-light);
   }
 
