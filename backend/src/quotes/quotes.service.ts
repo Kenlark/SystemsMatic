@@ -114,7 +114,6 @@ export class QuotesService {
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <div style="text-align: center; padding: 20px; background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); color: white; border-radius: 8px 8px 0 0;">
           <h1 style="margin: 0; font-size: 24px;">SystemsMatic</h1>
-          <p style="margin: 10px 0 0 0; opacity: 0.9;">Services informatiques professionnels</p>
         </div>
         
         <div style="padding: 30px; background: #ffffff; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px;">
@@ -157,7 +156,7 @@ export class QuotesService {
         </div>
         
         <div style="text-align: center; padding: 20px; color: #6b7280; font-size: 12px;">
-          <p>SystemsMatic - Services informatiques professionnels</p>
+          <p>SystemsMatic</p>
           <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.</p>
         </div>
       </div>
