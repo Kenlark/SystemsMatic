@@ -136,9 +136,24 @@
   cursor: pointer;
 }
 
-.form-checkbox-group:hover {
+.form-checkbox-group:hover:not(.disabled) {
   background: var(--color-bg-subtle);
   border-color: var(--color-border);
+}
+
+.form-checkbox-group.disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: #f8fafc;
+}
+
+.form-checkbox-group.disabled .form-checkbox {
+  cursor: not-allowed;
+}
+
+.form-checkbox-label.disabled {
+  cursor: not-allowed;
+  color: var(--color-text-muted);
 }
 
 .form-checkbox {

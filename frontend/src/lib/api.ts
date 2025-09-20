@@ -6,7 +6,7 @@ export interface CreateQuoteDto {
   firstName: string;
   lastName: string;
   email: string;
-  phone: string;
+  phone?: string;
   message: string;
   acceptPhone: boolean;
   acceptTerms: boolean;

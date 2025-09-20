@@ -27,6 +27,15 @@ enum AppointmentReason {
   AUTRE
 }
 
+enum QuoteStatus {
+  PENDING     // En attente de traitement
+  PROCESSING  // En cours de traitement
+  SENT        // Devis envoyé
+  ACCEPTED    // Devis accepté
+  REJECTED    // Devis refusé
+  EXPIRED     // Devis expiré
+}
+
 // --- MODELS ---
 
 model Contact {
@@ -40,6 +49,7 @@ model Contact {
   updatedAt DateTime  @updatedAt @db.Timestamptz(6)
 
   appointments Appointment[]
+  quotes       Quote[]
 
   @@unique([email])
   @@index([lastName, firstName])
@@ -87,6 +97,8 @@ model EmailLog {
   id            String       @id @default(cuid())
   appointmentId String?
   appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  quoteId       String?
+  quote         Quote?       @relation(fields: [quoteId], references: [id])
   to            String       @db.Citext
   subject       String
   template      String
@@ -102,6 +114,42 @@ model Reminder {
   sentAt        DateTime?   @db.Timestamptz(6)
   providerRef   String?
   createdAt     DateTime    @default(now()) @db.Timestamptz(6)
+}
+
+model Quote {
+  id        String @id @default(cuid())
+  contactId String
+  contact   Contact @relation(fields: [contactId], references: [id])
+
+  // Demande initiale 
+  projectDescription String      // Description du projet d'automatisme
+  acceptPhone        Boolean     @default(false) // Accepte contact téléphonique
+  acceptTerms        Boolean     // Acceptation des CGU
+  
+  // Statut et workflow 
+  status QuoteStatus @default(PENDING)
+  
+  // Réponse du devis 
+  quoteValidUntil DateTime? @db.Timestamptz(6) // Date d'expiration
+  quoteDocument  String?  // URL ou chemin vers le document PDF (optionnel)
+  
+  // Traçabilité 
+  processedAt DateTime? @db.Timestamptz(6) // Date de traitement
+  sentAt      DateTime? @db.Timestamptz(6) // Date d'envoi du devis
+  respondedAt DateTime? @db.Timestamptz(6) // Date de réponse client
+  
+  // Métadonnées système
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  // Relations avec les logs d'emails
+  emailLogs EmailLog[]
+
+  // Index pour les performances
+  @@index([contactId])
+  @@index([status])
+  @@index([createdAt])
+  @@index([status, createdAt])
 }
 
 model AdminUser {

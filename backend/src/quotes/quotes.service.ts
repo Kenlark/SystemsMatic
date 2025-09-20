@@ -2,6 +2,8 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
+import { UpdateQuoteDto } from './dto/update-quote.dto';
+import { QuoteFilterDto } from './dto/quote-filter.dto';
 
 @Injectable()
 export class QuotesService {
@@ -32,26 +34,22 @@ export class QuotesService {
         },
       });
 
-      // Créer un "pseudo-appointment" pour tracker la demande de devis
-      const quote = await this.prisma.appointment.create({
+      // Créer la demande de devis dans la table dédiée
+      const quote = await this.prisma.quote.create({
         data: {
           contactId: contact.id,
-          reason: 'AUTRE',
-          reasonOther: 'DEMANDE_DEVIS',
-          message: `DEVIS - ${createQuoteDto.message}\n\nPréférences:\n- Contact téléphonique: ${createQuoteDto.acceptPhone ? 'Oui' : 'Non'}\n- Conditions acceptées: ${createQuoteDto.acceptTerms ? 'Oui' : 'Non'}`,
-          requestedAt: new Date(),
-          timezone: 'America/Guadeloupe',
-          confirmationToken: `quote_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
-          cancellationToken: `quote_cancel_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          projectDescription: createQuoteDto.message,
+          acceptPhone: createQuoteDto.acceptPhone,
+          acceptTerms: createQuoteDto.acceptTerms,
           status: 'PENDING',
         },
       });
 
       // Envoyer l'email de notification à l'admin
-      await this.sendQuoteNotificationEmail(createQuoteDto);
+      await this.sendQuoteNotificationEmail(createQuoteDto, quote.id);
 
       // Envoyer l'email de confirmation au client
-      await this.sendQuoteConfirmationEmail(createQuoteDto);
+      await this.sendQuoteConfirmationEmail(createQuoteDto, quote.id);
 
       this.logger.log(
         `Demande de devis créée avec succès pour ${createQuoteDto.email}`,
@@ -71,7 +69,10 @@ export class QuotesService {
     }
   }
 
-  private async sendQuoteNotificationEmail(quoteDto: CreateQuoteDto) {
+  private async sendQuoteNotificationEmail(
+    quoteDto: CreateQuoteDto,
+    quoteId: string,
+  ) {
     const subject = `Nouvelle demande de devis - ${quoteDto.firstName} ${quoteDto.lastName}`;
 
     const html = `
@@ -84,7 +85,7 @@ export class QuotesService {
           <h3 style="color: #1e293b; margin-top: 0;">Informations du client</h3>
           <p><strong>Nom :</strong> ${quoteDto.firstName} ${quoteDto.lastName}</p>
           <p><strong>Email :</strong> ${quoteDto.email}</p>
-          <p><strong>Téléphone :</strong> ${quoteDto.phone}</p>
+          ${quoteDto.phone ? `<p><strong>Téléphone :</strong> ${quoteDto.phone}</p>` : ''}
           <p><strong>Accepte d'être recontacté par téléphone :</strong> ${quoteDto.acceptPhone ? 'Oui' : 'Non'}</p>
         </div>
         
@@ -105,9 +106,34 @@ export class QuotesService {
     const adminEmail = process.env.ADMIN_EMAIL || 'admin@systemsmatic.com';
 
     await this.mailService.sendEmail(adminEmail, subject, html);
+
+    // Logger l'email dans la base de données
+    await this.prisma.emailLog.create({
+      data: {
+        quoteId,
+        to: adminEmail,
+        subject,
+        template: 'quote-notification-admin',
+        meta: {
+          contact: {
+            firstName: quoteDto.firstName,
+            lastName: quoteDto.lastName,
+            email: quoteDto.email,
+            phone: quoteDto.phone,
+          },
+          preferences: {
+            acceptPhone: quoteDto.acceptPhone,
+            acceptTerms: quoteDto.acceptTerms,
+          },
+        },
+      },
+    });
   }
 
-  private async sendQuoteConfirmationEmail(quoteDto: CreateQuoteDto) {
+  private async sendQuoteConfirmationEmail(
+    quoteDto: CreateQuoteDto,
+    quoteId: string,
+  ) {
     const subject = 'Confirmation de réception - Demande de devis SystemsMatic';
 
     const html = `
@@ -127,7 +153,7 @@ export class QuotesService {
           <div style="background: #f8fafc; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3 style="color: #1e293b; margin-top: 0;">Récapitulatif de votre demande</h3>
             <p><strong>Email :</strong> ${quoteDto.email}</p>
-            <p><strong>Téléphone :</strong> ${quoteDto.phone}</p>
+            ${quoteDto.phone ? `<p><strong>Téléphone :</strong> ${quoteDto.phone}</p>` : ''}
             ${
               quoteDto.acceptPhone
                 ? '<p style="color: #059669;"><strong>✓</strong> Vous acceptez d\'être recontacté par téléphone</p>'
@@ -163,5 +189,212 @@ export class QuotesService {
     `;
 
     await this.mailService.sendEmail(quoteDto.email, subject, html);
+
+    // Logger l'email dans la base de données
+    await this.prisma.emailLog.create({
+      data: {
+        quoteId,
+        to: quoteDto.email,
+        subject,
+        template: 'quote-confirmation-client',
+        meta: {
+          contact: {
+            firstName: quoteDto.firstName,
+            lastName: quoteDto.lastName,
+          },
+          projectDescription: quoteDto.message,
+          preferences: {
+            acceptPhone: quoteDto.acceptPhone,
+            acceptTerms: quoteDto.acceptTerms,
+          },
+        },
+      },
+    });
+  }
+
+  // Méthodes additionnelles pour la gestion des devis
+
+  async findAll(page = 1, limit = 10, status?: string) {
+    const where = status ? { status: status as any } : {};
+
+    const [quotes, total] = await Promise.all([
+      this.prisma.quote.findMany({
+        where,
+        include: {
+          contact: true,
+          emailLogs: true,
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.quote.count({ where }),
+    ]);
+
+    return {
+      data: quotes,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async findOne(id: string) {
+    return this.prisma.quote.findUnique({
+      where: { id },
+      include: {
+        contact: true,
+        emailLogs: {
+          orderBy: { sentAt: 'desc' },
+        },
+      },
+    });
+  }
+
+  async updateStatus(id: string, status: string, data?: any) {
+    const updateData: any = { status };
+
+    // Mise à jour des timestamps selon le statut
+    switch (status) {
+      case 'PROCESSING':
+        updateData.processedAt = new Date();
+        break;
+      case 'SENT':
+        updateData.sentAt = new Date();
+        if (data?.validUntil)
+          updateData.quoteValidUntil = new Date(data.validUntil);
+        if (data?.document) updateData.quoteDocument = data.document;
+        break;
+      case 'ACCEPTED':
+      case 'REJECTED':
+        updateData.respondedAt = new Date();
+        break;
+    }
+
+    return this.prisma.quote.update({
+      where: { id },
+      data: updateData,
+      include: {
+        contact: true,
+      },
+    });
+  }
+
+  async getStats() {
+    const [total, pending, processing, sent, accepted, rejected] =
+      await Promise.all([
+        this.prisma.quote.count(),
+        this.prisma.quote.count({ where: { status: 'PENDING' } }),
+        this.prisma.quote.count({ where: { status: 'PROCESSING' } }),
+        this.prisma.quote.count({ where: { status: 'SENT' } }),
+        this.prisma.quote.count({ where: { status: 'ACCEPTED' } }),
+        this.prisma.quote.count({ where: { status: 'REJECTED' } }),
+      ]);
+
+    return {
+      total,
+      pending,
+      processing,
+      sent,
+      accepted,
+      rejected,
+      conversionRate:
+        total > 0 ? ((accepted / total) * 100).toFixed(2) : '0.00',
+    };
+  }
+
+  async findAllWithFilters(page = 1, limit = 10, filters: QuoteFilterDto) {
+    const where: any = {};
+
+    // Filtre par statut
+    if (filters.status) {
+      where.status = filters.status;
+    }
+
+    // Filtre par contact ID
+    if (filters.contactId) {
+      where.contactId = filters.contactId;
+    }
+
+    // Recherche par nom ou email du contact
+    if (filters.search) {
+      where.contact = {
+        OR: [
+          { firstName: { contains: filters.search, mode: 'insensitive' } },
+          { lastName: { contains: filters.search, mode: 'insensitive' } },
+          { email: { contains: filters.search, mode: 'insensitive' } },
+        ],
+      };
+    }
+
+    const [quotes, total] = await Promise.all([
+      this.prisma.quote.findMany({
+        where,
+        include: {
+          contact: true,
+          emailLogs: {
+            select: {
+              id: true,
+              sentAt: true,
+              template: true,
+            },
+            orderBy: { sentAt: 'desc' },
+          },
+        },
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.quote.count({ where }),
+    ]);
+
+    return {
+      data: quotes,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    };
+  }
+
+  async updateQuote(id: string, updateQuoteDto: UpdateQuoteDto) {
+    const updateData: any = { ...updateQuoteDto };
+
+    // Convertir les dates string en objets Date si nécessaire
+    if (updateQuoteDto.quoteValidUntil) {
+      updateData.quoteValidUntil = new Date(updateQuoteDto.quoteValidUntil);
+    }
+
+    // Mettre à jour les timestamps selon le statut
+    if (updateQuoteDto.status) {
+      switch (updateQuoteDto.status) {
+        case 'PROCESSING':
+          updateData.processedAt = new Date();
+          break;
+        case 'SENT':
+          updateData.sentAt = new Date();
+          break;
+        case 'ACCEPTED':
+        case 'REJECTED':
+          updateData.respondedAt = new Date();
+          break;
+      }
+    }
+
+    return this.prisma.quote.update({
+      where: { id },
+      data: updateData,
+      include: {
+        contact: true,
+        emailLogs: {
+          orderBy: { sentAt: 'desc' },
+        },
+      },
+    });
   }
 }

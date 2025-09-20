@@ -11,14 +11,19 @@ import {
   Request,
 } from '@nestjs/common';
 import { AppointmentsService } from '../appointments/appointments.service';
+import { QuotesService } from '../quotes/quotes.service';
 import { AppointmentStatus } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
+import { UpdateQuoteDto } from '../quotes/dto/update-quote.dto';
 
 @Controller('backoffice')
 @UseGuards(JwtAuthGuard, AdminGuard)
 export class BackofficeController {
-  constructor(private readonly appointmentsService: AppointmentsService) {}
+  constructor(
+    private readonly appointmentsService: AppointmentsService,
+    private readonly quotesService: QuotesService,
+  ) {}
 
   @Get('appointments')
   async getAppointments(@Query('status') status?: AppointmentStatus) {
@@ -86,6 +91,65 @@ export class BackofficeController {
       id,
       data.newScheduledAt,
     );
+  }
+
+  // === GESTION DES DEVIS ===
+
+  @Get('quotes')
+  async getQuotes(
+    @Query('page') page?: string,
+    @Query('limit') limit?: string,
+    @Query('status') status?: string,
+    @Query('search') search?: string,
+  ) {
+    const pageNum = parseInt(page || '1');
+    const limitNum = parseInt(limit || '10');
+
+    return this.quotesService.findAllWithFilters(pageNum, limitNum, {
+      status,
+      search,
+    });
+  }
+
+  @Get('quotes/stats')
+  async getQuotesStats() {
+    return this.quotesService.getStats();
+  }
+
+  @Get('quotes/:id')
+  async getQuote(@Param('id') id: string) {
+    return this.quotesService.findOne(id);
+  }
+
+  @Put('quotes/:id')
+  async updateQuote(
+    @Param('id') id: string,
+    @Body() updateQuoteDto: UpdateQuoteDto,
+  ) {
+    return this.quotesService.updateQuote(id, updateQuoteDto);
+  }
+
+  @Put('quotes/:id/status')
+  async updateQuoteStatus(
+    @Param('id') id: string,
+    @Body() data: { status: string; data?: any },
+  ) {
+    return this.quotesService.updateStatus(id, data.status, data.data);
+  }
+
+  // === DASHBOARD GLOBAL ===
+
+  @Get('dashboard')
+  async getDashboard() {
+    const [appointmentStats, quoteStats] = await Promise.all([
+      this.appointmentsService.getStatsAdmin(),
+      this.quotesService.getStats(),
+    ]);
+
+    return {
+      appointments: appointmentStats,
+      quotes: quoteStats,
+    };
   }
 
   @Get('profile')

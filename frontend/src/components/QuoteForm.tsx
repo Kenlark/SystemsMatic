@@ -38,9 +38,8 @@ export default function QuoteForm() {
       newErrors.email = "Format d'email invalide";
     }
 
-    if (!formData.phone.trim()) {
-      newErrors.phone = "Le téléphone est requis";
-    } else if (
+    if (
+      formData.phone?.trim() &&
       !/^[\d\s\-\+\(\)]{10,}$/.test(formData.phone.replace(/\s/g, ""))
     ) {
       newErrors.phone = "Format de téléphone invalide";
@@ -71,7 +70,13 @@ export default function QuoteForm() {
     setIsSubmitting(true);
 
     try {
-      await quoteService.create(formData);
+      // Préparer les données en excluant le phone si vide
+      const dataToSend = {
+        ...formData,
+        phone: formData.phone?.trim() || undefined,
+      };
+
+      await quoteService.create(dataToSend);
 
       setIsFormSubmitted(true);
       setFormData({
@@ -85,7 +90,9 @@ export default function QuoteForm() {
       });
       setErrors({});
     } catch (error: any) {
-      console.error("Erreur:", error);
+      console.log("Erreur complète:", error);
+      console.log("Données envoyées:", formData);
+      console.log("Réponse du serveur:", error.response?.data);
 
       const errorMessage =
         error.response?.data?.message ||
@@ -100,7 +107,14 @@ export default function QuoteForm() {
     field: keyof QuoteFormData,
     value: string | boolean
   ) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    const newFormData = { ...formData, [field]: value };
+
+    // Si on vide le téléphone, décocher automatiquement acceptPhone
+    if (field === "phone" && typeof value === "string" && !value.trim()) {
+      newFormData.acceptPhone = false;
+    }
+
+    setFormData(newFormData);
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
@@ -181,7 +195,7 @@ export default function QuoteForm() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="phone" className="form-label required">
+                <label htmlFor="phone" className="form-label">
                   Téléphone
                 </label>
                 <input
@@ -218,7 +232,11 @@ export default function QuoteForm() {
             </div>
 
             <div className="form-checkboxes">
-              <div className="form-checkbox-group">
+              <div
+                className={`form-checkbox-group ${
+                  !formData.phone?.trim() ? "disabled" : ""
+                }`}
+              >
                 <input
                   type="checkbox"
                   id="acceptPhone"
@@ -227,9 +245,14 @@ export default function QuoteForm() {
                   onChange={(e) =>
                     handleInputChange("acceptPhone", e.target.checked)
                   }
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !formData.phone?.trim()}
                 />
-                <label htmlFor="acceptPhone" className="form-checkbox-label">
+                <label
+                  htmlFor="acceptPhone"
+                  className={`form-checkbox-label ${
+                    !formData.phone?.trim() ? "disabled" : ""
+                  }`}
+                >
                   J'accepte d'être recontacté(e) par téléphone pour discuter de
                   ma demande
                 </label>

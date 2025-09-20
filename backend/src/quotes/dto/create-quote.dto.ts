@@ -3,8 +3,10 @@ import {
   IsEmail,
   IsBoolean,
   IsNotEmpty,
+  IsOptional,
   Length,
   Matches,
+  ValidateIf,
 } from 'class-validator';
 
 export class CreateQuoteDto {
@@ -22,12 +24,16 @@ export class CreateQuoteDto {
   @IsNotEmpty()
   email: string;
 
+  @ValidateIf((o) => o.acceptPhone || o.phone)
   @IsString()
-  @IsNotEmpty()
+  @IsNotEmpty({
+    message:
+      "Un numéro de téléphone est requis si vous acceptez d'être recontacté par téléphone",
+  })
   @Matches(/^[\d\s\-\+\(\)]{10,}$/, {
     message: 'Le numéro de téléphone doit être valide',
   })
-  phone: string;
+  phone?: string;
 
   @IsString()
   @IsNotEmpty()

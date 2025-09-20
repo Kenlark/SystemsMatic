@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { backofficeApi } from "@/lib/backoffice-api";
+import { backofficeApi, Quote, QuoteUpdate } from "@/lib/backoffice-api";
 import { authApi, LoginData } from "@/lib/auth-api";
 import {
   Appointment,
@@ -38,6 +38,17 @@ export default function AdminPage() {
   const [stats, setStats] = useState<any>(null);
   const [showDatePicker, setShowDatePicker] = useState<string | null>(null);
   const [selectedDateTime, setSelectedDateTime] = useState<string>("");
+
+  // États pour les devis
+  const [activeTab, setActiveTab] = useState<"appointments" | "quotes">(
+    "appointments"
+  );
+  const [quotes, setQuotes] = useState<Quote[]>([]);
+  const [quotesLoading, setQuotesLoading] = useState(true);
+  const [quotesStats, setQuotesStats] = useState<any>(null);
+  const [quotesFilter, setQuotesFilter] = useState<string>("");
+  const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
+  const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
 
   // Vérifier l'authentification au chargement
   useEffect(() => {
@@ -87,10 +98,15 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      fetchAppointments();
-      fetchStats();
+      if (activeTab === "appointments") {
+        fetchAppointments();
+        fetchStats();
+      } else {
+        fetchQuotes();
+        fetchQuotesStats();
+      }
     }
-  }, [filter, isAuthenticated]);
+  }, [filter, quotesFilter, isAuthenticated, activeTab]);
 
   const fetchAppointments = async () => {
     try {
@@ -179,7 +195,9 @@ export default function AdminPage() {
       setUser(null);
       setIsAuthenticated(false);
       setAppointments([]);
+      setQuotes([]);
       setStats(null);
+      setQuotesStats(null);
       showSuccess("Déconnexion réussie");
     } catch (error) {
       console.error("Erreur lors de la déconnexion:", error);
@@ -187,8 +205,72 @@ export default function AdminPage() {
       setUser(null);
       setIsAuthenticated(false);
       setAppointments([]);
+      setQuotes([]);
       setStats(null);
+      setQuotesStats(null);
       showError("Erreur lors de la déconnexion");
+    }
+  };
+
+  // Fonctions pour les devis
+  const fetchQuotes = async () => {
+    try {
+      setQuotesLoading(true);
+      const response = await backofficeApi.getQuotes({
+        status: quotesFilter || undefined,
+        page: 1,
+        limit: 50,
+      });
+      setQuotes(response.data);
+    } catch (error) {
+      console.error("Erreur lors du chargement des devis:", error);
+      showError("Erreur lors du chargement des devis");
+    } finally {
+      setQuotesLoading(false);
+    }
+  };
+
+  const fetchQuotesStats = async () => {
+    try {
+      const data = await backofficeApi.getQuotesStats();
+      setQuotesStats(data);
+    } catch (error) {
+      console.error(
+        "Erreur lors du chargement des statistiques des devis:",
+        error
+      );
+    }
+  };
+
+  const updateQuoteStatus = async (quoteId: string, newStatus: string) => {
+    try {
+      await backofficeApi.updateQuoteStatus(quoteId, newStatus);
+      fetchQuotes();
+      fetchQuotesStats();
+      showSuccess(`Statut mis à jour vers "${getQuoteStatusLabel(newStatus)}"`);
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du statut:", error);
+      showError("Erreur lors de la mise à jour du statut");
+    }
+  };
+
+  const handleEditQuote = (quote: Quote) => {
+    setEditingQuote(quote);
+    setIsQuoteModalOpen(true);
+  };
+
+  const handleSaveQuote = async (updatedData: QuoteUpdate) => {
+    if (!editingQuote) return;
+    try {
+      await backofficeApi.updateQuote(editingQuote.id, updatedData);
+      showSuccess("Devis mis à jour avec succès");
+      setIsQuoteModalOpen(false);
+      setEditingQuote(null);
+      fetchQuotes();
+      fetchQuotesStats();
+    } catch (error) {
+      console.error("Erreur lors de la mise à jour du devis:", error);
+      showError("Erreur lors de la mise à jour du devis");
     }
   };
 
@@ -243,6 +325,45 @@ export default function AdminPage() {
         return "status-rejected";
       case AppointmentStatus.COMPLETED:
         return "status-completed";
+      default:
+        return "";
+    }
+  };
+
+  // Fonctions utilitaires pour les devis
+  const getQuoteStatusLabel = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "En attente";
+      case "PROCESSING":
+        return "En cours";
+      case "SENT":
+        return "Envoyé";
+      case "ACCEPTED":
+        return "Accepté";
+      case "REJECTED":
+        return "Refusé";
+      case "EXPIRED":
+        return "Expiré";
+      default:
+        return status;
+    }
+  };
+
+  const getQuoteStatusColor = (status: string) => {
+    switch (status) {
+      case "PENDING":
+        return "quote-status-pending";
+      case "PROCESSING":
+        return "quote-status-processing";
+      case "SENT":
+        return "quote-status-sent";
+      case "ACCEPTED":
+        return "quote-status-accepted";
+      case "REJECTED":
+        return "quote-status-rejected";
+      case "EXPIRED":
+        return "quote-status-expired";
       default:
         return "";
     }
@@ -314,25 +435,60 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="admin-filters">
-        <select
-          value={filter}
-          onChange={(e) =>
-            setFilter(e.target.value as AppointmentStatus | "ALL")
-          }
-          className="admin-filter-select"
+      {/* Navigation par onglets */}
+      <div className="admin-tabs">
+        <button
+          className={`admin-tab ${
+            activeTab === "appointments" ? "active" : ""
+          }`}
+          onClick={() => setActiveTab("appointments")}
         >
-          <option value="ALL">Tous les statuts</option>
-          <option value={AppointmentStatus.PENDING}>En attente</option>
-          <option value={AppointmentStatus.CONFIRMED}>Confirmé</option>
-          <option value={AppointmentStatus.CANCELLED}>Annulé</option>
-          <option value={AppointmentStatus.REJECTED}>Rejeté</option>
-          <option value={AppointmentStatus.COMPLETED}>Terminé</option>
-        </select>
+          📅 Rendez-vous
+        </button>
+        <button
+          className={`admin-tab ${activeTab === "quotes" ? "active" : ""}`}
+          onClick={() => setActiveTab("quotes")}
+        >
+          💰 Devis
+        </button>
       </div>
 
-      {stats && (
-        <div className="admin-stats">
+      <div className="admin-filters">
+        {activeTab === "appointments" ? (
+          <select
+            value={filter}
+            onChange={(e) =>
+              setFilter(e.target.value as AppointmentStatus | "ALL")
+            }
+            className="admin-filter-select"
+          >
+            <option value="ALL">Tous les statuts</option>
+            <option value={AppointmentStatus.PENDING}>En attente</option>
+            <option value={AppointmentStatus.CONFIRMED}>Confirmé</option>
+            <option value={AppointmentStatus.CANCELLED}>Annulé</option>
+            <option value={AppointmentStatus.REJECTED}>Rejeté</option>
+            <option value={AppointmentStatus.COMPLETED}>Terminé</option>
+          </select>
+        ) : (
+          <select
+            value={quotesFilter}
+            onChange={(e) => setQuotesFilter(e.target.value)}
+            className="admin-filter-select"
+          >
+            <option value="">Tous les statuts</option>
+            <option value="PENDING">En attente</option>
+            <option value="PROCESSING">En cours</option>
+            <option value="SENT">Envoyés</option>
+            <option value="ACCEPTED">Acceptés</option>
+            <option value="REJECTED">Refusés</option>
+            <option value="EXPIRED">Expirés</option>
+          </select>
+        )}
+      </div>
+
+      {/* Statistiques dynamiques selon l'onglet */}
+      {activeTab === "appointments" && stats && (
+        <div className="admin-stats appointments-stats">
           <div className="stat-card total">
             <div className="stat-icon">
               <svg viewBox="0 0 24 24" fill="currentColor">
@@ -394,186 +550,441 @@ export default function AdminPage() {
         </div>
       )}
 
+      {activeTab === "quotes" && quotesStats && (
+        <div className="admin-stats quotes-stats">
+          <div className="stat-card total">
+            <div className="stat-icon">💰</div>
+            <h3>Total</h3>
+            <p>{quotesStats.total || 0}</p>
+          </div>
+          <div className="stat-card pending">
+            <div className="stat-icon">⏳</div>
+            <h3>En attente</h3>
+            <p>{quotesStats.pending || 0}</p>
+          </div>
+          <div className="stat-card processing">
+            <div className="stat-icon">🔄</div>
+            <h3>En cours</h3>
+            <p>{quotesStats.processing || 0}</p>
+          </div>
+          <div className="stat-card sent">
+            <div className="stat-icon">📤</div>
+            <h3>Envoyés</h3>
+            <p>{quotesStats.sent || 0}</p>
+          </div>
+          <div className="stat-card accepted">
+            <div className="stat-icon">✅</div>
+            <h3>Acceptés</h3>
+            <p>{quotesStats.accepted || 0}</p>
+          </div>
+        </div>
+      )}
+
       <div className="admin-content">
-        {loading ? (
+        {activeTab === "appointments" ? (
+          loading ? (
+            <div className="admin-loading">
+              <div className="admin-spinner">
+                <div className="admin-spinner-icon"></div>
+                <span>Chargement des rendez-vous...</span>
+              </div>
+            </div>
+          ) : (
+            <div className="appointments-list">
+              {appointments.length === 0 ? (
+                <p className="no-appointments">Aucun rendez-vous trouvé</p>
+              ) : (
+                appointments.map((appointment) => (
+                  <div
+                    key={appointment.id}
+                    className={`appointment-card ${getStatusColor(
+                      appointment.status
+                    )}`}
+                  >
+                    <div className="appointment-header">
+                      <h3>
+                        {appointment.contact.firstName}{" "}
+                        {appointment.contact.lastName}
+                      </h3>
+                      <span
+                        className={`status-badge ${getStatusColor(
+                          appointment.status
+                        )}`}
+                      >
+                        {getStatusLabel(appointment.status)}
+                      </span>
+                    </div>
+
+                    <div className="appointment-details">
+                      <p>
+                        <strong>Email :</strong> {appointment.contact.email}
+                      </p>
+                      <p>
+                        <strong>Téléphone :</strong>{" "}
+                        {appointment.contact.phone || "Non renseigné"}
+                      </p>
+                      <p>
+                        <strong>Demandé le :</strong>{" "}
+                        {formatRequestedDate(
+                          appointment.requestedAt,
+                          appointment.timezone
+                        )}
+                      </p>
+                      {appointment.scheduledAt && (
+                        <p>
+                          <strong>Programmé le :</strong>{" "}
+                          {formatDate(
+                            appointment.scheduledAt,
+                            appointment.timezone
+                          )}
+                        </p>
+                      )}
+                      <p>
+                        <strong>Créé le :</strong>{" "}
+                        {formatCreatedDate(appointment.createdAt)}
+                      </p>
+                      {appointment.message && (
+                        <p>
+                          <strong>Message :</strong> {appointment.message}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="appointment-actions">
+                      {appointment.status === AppointmentStatus.PENDING && (
+                        <>
+                          <button
+                            onClick={() =>
+                              updateAppointmentStatus(
+                                appointment.id,
+                                AppointmentStatus.CONFIRMED
+                              )
+                            }
+                            className="action-button confirm"
+                          >
+                            Confirmer
+                          </button>
+                          <button
+                            onClick={() => setShowDatePicker(appointment.id)}
+                            className="action-button reschedule"
+                          >
+                            Reprogrammer
+                          </button>
+                          <button
+                            onClick={() =>
+                              updateAppointmentStatus(
+                                appointment.id,
+                                AppointmentStatus.REJECTED
+                              )
+                            }
+                            className="action-button reject"
+                          >
+                            Rejeter
+                          </button>
+                        </>
+                      )}
+                      {appointment.status === AppointmentStatus.CONFIRMED && (
+                        <button
+                          onClick={() =>
+                            updateAppointmentStatus(
+                              appointment.id,
+                              AppointmentStatus.COMPLETED
+                            )
+                          }
+                          className="action-button complete"
+                        >
+                          Marquer comme terminé
+                        </button>
+                      )}
+                      {appointment.status === AppointmentStatus.CONFIRMED &&
+                        appointment.scheduledAt && (
+                          <button
+                            onClick={() => sendReminder(appointment.id)}
+                            className="action-button reminder"
+                          >
+                            Envoyer un rappel
+                          </button>
+                        )}
+                      <button
+                        onClick={() => deleteAppointment(appointment.id)}
+                        className="action-button delete"
+                      >
+                        Supprimer
+                      </button>
+                    </div>
+
+                    {/* Sélecteur de date/heure pour la reprogrammation */}
+                    {showDatePicker === appointment.id && (
+                      <div className="date-picker-overlay">
+                        <div className="date-picker-modal">
+                          <h4>Proposer une reprogrammation</h4>
+                          <p className="reschedule-info">
+                            Le client recevra un email avec la nouvelle
+                            proposition de date/heure. Il pourra accepter ou
+                            refuser.
+                          </p>
+                          <AdminDateTimePicker
+                            value={selectedDateTime}
+                            onChange={setSelectedDateTime}
+                            onConfirm={async () => {
+                              if (selectedDateTime) {
+                                try {
+                                  await backofficeApi.proposeReschedule(
+                                    appointment.id,
+                                    selectedDateTime
+                                  );
+                                  showSuccess(
+                                    "Proposition de reprogrammation envoyée"
+                                  );
+                                  setShowDatePicker(null);
+                                  setSelectedDateTime("");
+                                  fetchAppointments();
+                                } catch (error) {
+                                  console.error(
+                                    "Erreur lors de la reprogrammation:",
+                                    error
+                                  );
+                                  showError(
+                                    "Erreur lors de la reprogrammation"
+                                  );
+                                }
+                              }
+                            }}
+                            onCancel={() => {
+                              setShowDatePicker(null);
+                              setSelectedDateTime("");
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+            </div>
+          )
+        ) : quotesLoading ? (
           <div className="admin-loading">
             <div className="admin-spinner">
               <div className="admin-spinner-icon"></div>
-              <span>Chargement des rendez-vous...</span>
+              <span>Chargement des devis...</span>
             </div>
           </div>
         ) : (
-          <div className="appointments-list">
-            {appointments.length === 0 ? (
-              <p className="no-appointments">Aucun rendez-vous trouvé</p>
+          <div className="quotes-list">
+            {quotes.length === 0 ? (
+              <p className="no-quotes">Aucun devis trouvé</p>
             ) : (
-              appointments.map((appointment) => (
+              quotes.map((quote) => (
                 <div
-                  key={appointment.id}
-                  className={`appointment-card ${getStatusColor(
-                    appointment.status
-                  )}`}
+                  key={quote.id}
+                  className={`quote-card ${getQuoteStatusColor(quote.status)}`}
                 >
-                  <div className="appointment-header">
+                  <div className="quote-header">
                     <h3>
-                      {appointment.contact.firstName}{" "}
-                      {appointment.contact.lastName}
+                      {quote.contact.firstName} {quote.contact.lastName}
                     </h3>
                     <span
-                      className={`status-badge ${getStatusColor(
-                        appointment.status
+                      className={`status-badge ${getQuoteStatusColor(
+                        quote.status
                       )}`}
                     >
-                      {getStatusLabel(appointment.status)}
+                      {getQuoteStatusLabel(quote.status)}
                     </span>
                   </div>
 
-                  <div className="appointment-details">
+                  <div className="quote-details">
                     <p>
-                      <strong>Email :</strong> {appointment.contact.email}
+                      <strong>Email :</strong> {quote.contact.email}
                     </p>
-                    <p>
-                      <strong>Téléphone :</strong>{" "}
-                      {appointment.contact.phone || "Non renseigné"}
-                    </p>
-                    <p>
-                      <strong>Demandé le :</strong>{" "}
-                      {formatRequestedDate(
-                        appointment.requestedAt,
-                        appointment.timezone
-                      )}
-                    </p>
-                    {appointment.scheduledAt && (
+                    {quote.contact.phone && (
                       <p>
-                        <strong>Programmé le :</strong>{" "}
-                        {formatDate(
-                          appointment.scheduledAt,
-                          appointment.timezone
-                        )}
+                        <strong>Téléphone :</strong> {quote.contact.phone}
                       </p>
                     )}
                     <p>
                       <strong>Créé le :</strong>{" "}
-                      {formatCreatedDate(appointment.createdAt)}
+                      {formatCreatedDate(quote.createdAt)}
                     </p>
-                    {appointment.message && (
+                    {quote.quoteValidUntil && (
                       <p>
-                        <strong>Message :</strong> {appointment.message}
+                        <strong>Valide jusqu'au :</strong>{" "}
+                        {formatCreatedDate(quote.quoteValidUntil)}
                       </p>
                     )}
+                    <p>
+                      <strong>Contact téléphonique :</strong>{" "}
+                      {quote.acceptPhone ? "✅ Accepté" : "❌ Refusé"}
+                    </p>
+                    <div className="quote-description">
+                      <strong>Description du projet :</strong>
+                      <p>{quote.projectDescription}</p>
+                    </div>
                   </div>
 
-                  <div className="appointment-actions">
-                    {appointment.status === AppointmentStatus.PENDING && (
+                  <div className="quote-actions">
+                    <button
+                      onClick={() => handleEditQuote(quote)}
+                      className="action-button edit"
+                    >
+                      Modifier
+                    </button>
+
+                    {quote.status === "PENDING" && (
+                      <button
+                        onClick={() =>
+                          updateQuoteStatus(quote.id, "PROCESSING")
+                        }
+                        className="action-button process"
+                      >
+                        Traiter
+                      </button>
+                    )}
+
+                    {quote.status === "PROCESSING" && (
+                      <button
+                        onClick={() => updateQuoteStatus(quote.id, "SENT")}
+                        className="action-button send"
+                      >
+                        Marquer envoyé
+                      </button>
+                    )}
+
+                    {quote.status === "SENT" && (
                       <>
                         <button
                           onClick={() =>
-                            updateAppointmentStatus(
-                              appointment.id,
-                              AppointmentStatus.CONFIRMED
-                            )
+                            updateQuoteStatus(quote.id, "ACCEPTED")
                           }
-                          className="action-button confirm"
+                          className="action-button accept"
                         >
-                          Confirmer
-                        </button>
-                        <button
-                          onClick={() => setShowDatePicker(appointment.id)}
-                          className="action-button reschedule"
-                        >
-                          Reprogrammer
+                          Accepté
                         </button>
                         <button
                           onClick={() =>
-                            updateAppointmentStatus(
-                              appointment.id,
-                              AppointmentStatus.REJECTED
-                            )
+                            updateQuoteStatus(quote.id, "REJECTED")
                           }
                           className="action-button reject"
                         >
-                          Rejeter
+                          Refusé
                         </button>
                       </>
                     )}
-                    {appointment.status === AppointmentStatus.CONFIRMED && (
-                      <button
-                        onClick={() =>
-                          updateAppointmentStatus(
-                            appointment.id,
-                            AppointmentStatus.COMPLETED
-                          )
-                        }
-                        className="action-button complete"
-                      >
-                        Marquer comme terminé
-                      </button>
-                    )}
-                    {appointment.status === AppointmentStatus.CONFIRMED &&
-                      appointment.scheduledAt && (
-                        <button
-                          onClick={() => sendReminder(appointment.id)}
-                          className="action-button reminder"
-                        >
-                          Envoyer un rappel
-                        </button>
-                      )}
-                    <button
-                      onClick={() => deleteAppointment(appointment.id)}
-                      className="action-button delete"
-                    >
-                      Supprimer
-                    </button>
                   </div>
-
-                  {/* Sélecteur de date/heure pour la reprogrammation */}
-                  {showDatePicker === appointment.id && (
-                    <div className="date-picker-overlay">
-                      <div className="date-picker-modal">
-                        <h4>Proposer une reprogrammation</h4>
-                        <p className="reschedule-info">
-                          Le client recevra un email avec la nouvelle
-                          proposition de date/heure. Il pourra accepter ou
-                          refuser.
-                        </p>
-                        <AdminDateTimePicker
-                          value={selectedDateTime}
-                          onChange={setSelectedDateTime}
-                          onConfirm={async () => {
-                            if (selectedDateTime) {
-                              try {
-                                await backofficeApi.proposeReschedule(
-                                  appointment.id,
-                                  selectedDateTime
-                                );
-                                showSuccess(
-                                  "Proposition de reprogrammation envoyée"
-                                );
-                                setShowDatePicker(null);
-                                setSelectedDateTime("");
-                                fetchAppointments();
-                              } catch (error) {
-                                console.error(
-                                  "Erreur lors de la reprogrammation:",
-                                  error
-                                );
-                                showError("Erreur lors de la reprogrammation");
-                              }
-                            }
-                          }}
-                          onCancel={() => {
-                            setShowDatePicker(null);
-                            setSelectedDateTime("");
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
                 </div>
               ))
             )}
           </div>
         )}
+
+        {/* Modal d'édition des devis */}
+        {isQuoteModalOpen && editingQuote && (
+          <QuoteEditModal
+            quote={editingQuote}
+            onSave={handleSaveQuote}
+            onClose={() => {
+              setIsQuoteModalOpen(false);
+              setEditingQuote(null);
+            }}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Composant Modal pour l'édition des devis
+function QuoteEditModal({
+  quote,
+  onSave,
+  onClose,
+}: {
+  quote: Quote;
+  onSave: (data: QuoteUpdate) => void;
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState<QuoteUpdate>({
+    status: quote.status,
+    quoteValidUntil: quote.quoteValidUntil
+      ? quote.quoteValidUntil.split("T")[0]
+      : "",
+    quoteDocument: quote.quoteDocument || "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSave(formData);
+  };
+
+  return (
+    <div className="quote-modal-overlay" onClick={onClose}>
+      <div className="quote-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="quote-modal-header">
+          <h4>
+            Modifier le devis - {quote.contact.firstName}{" "}
+            {quote.contact.lastName}
+          </h4>
+          <button className="quote-modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="quote-modal-body">
+            <div className="quote-form-group">
+              <label>Statut</label>
+              <select
+                value={formData.status}
+                onChange={(e) =>
+                  setFormData((prev) => ({ ...prev, status: e.target.value }))
+                }
+              >
+                <option value="PENDING">En attente</option>
+                <option value="PROCESSING">En cours</option>
+                <option value="SENT">Envoyé</option>
+                <option value="ACCEPTED">Accepté</option>
+                <option value="REJECTED">Refusé</option>
+                <option value="EXPIRED">Expiré</option>
+              </select>
+            </div>
+
+            <div className="quote-form-group">
+              <label>Valide jusqu'au</label>
+              <input
+                type="date"
+                value={formData.quoteValidUntil}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    quoteValidUntil: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
+            <div className="quote-form-group">
+              <label>Document (URL)</label>
+              <input
+                type="url"
+                value={formData.quoteDocument}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    quoteDocument: e.target.value,
+                  }))
+                }
+                placeholder="https://exemple.com/devis.pdf"
+              />
+            </div>
+          </div>
+
+          <div className="quote-modal-actions">
+            <button type="button" onClick={onClose}>
+              Annuler
+            </button>
+            <button type="submit">Sauvegarder</button>
+          </div>
+        </form>
       </div>
     </div>
   );
