@@ -16,6 +16,8 @@ const EMAIL_CONFIG = {
   DEFAULT_FROM: 'noreply@systemsmatic.com',
   DATE_FORMAT: 'dddd DD MMMM YYYY à HH:mm',
   BASE_URL: process.env.PUBLIC_URL || 'http://localhost:3000',
+  LOGO_URL:
+    'https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg',
 } as const;
 
 /**
@@ -122,7 +124,7 @@ export class MailService {
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #2563eb;">Demande de rendez-vous reçue ✅</h2>
+        <h2 style="color: #2563eb; margin-top: 0;">Demande de rendez-vous reçue ✅</h2>
         
         <p>Bonjour <strong>${contact.firstName}</strong>,</p>
         
@@ -137,16 +139,19 @@ export class MailService {
         </div>
         
         <p style="margin-top: 30px;">
-          <a href="${cancelUrl}" style="color: #dc2626; text-decoration: none;">
+          <a href="${cancelUrl}" style="color: #dc2626; text-decoration: none; font-weight: bold;">
             🚫 Annuler cette demande
           </a>
         </p>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-        <p style="font-size: 14px; color: #6b7280;">
-          System's Matic - Service de rendez-vous<br>
-          Cet email a été envoyé automatiquement, merci de ne pas y répondre.
-        </p>
+        <div style="display: flex; align-items: center; font-size: 14px; color: #6b7280;">
+          <img src="${EMAIL_CONFIG.LOGO_URL}" alt="System's Matic" style="width: 40px; height: auto; margin-right: 10px;">
+          <div>
+            <strong>System's Matic</strong> - Service de rendez-vous<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+          </div>
+        </div>
       </div>
     `;
 
@@ -173,7 +178,7 @@ export class MailService {
 
     const html = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #059669;">Rendez-vous confirmé 🎉</h2>
+        <h2 style="color: #059669; margin-top: 0;">Rendez-vous confirmé 🎉</h2>
         
         <p>Bonjour <strong>${appointment.contact.firstName}</strong>,</p>
         
@@ -201,10 +206,13 @@ export class MailService {
         </p>
         
         <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
-        <p style="font-size: 14px; color: #6b7280;">
-          System's Matic - Service de rendez-vous<br>
-          Cet email a été envoyé automatiquement, merci de ne pas y répondre.
-        </p>
+        <div style="display: flex; align-items: center; font-size: 14px; color: #6b7280;">
+          <img src="${EMAIL_CONFIG.LOGO_URL}" alt="System's Matic" style="width: 40px; height: auto; margin-right: 10px;">
+          <div>
+            <strong>System's Matic</strong> - Service de rendez-vous<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+          </div>
+        </div>
       </div>
     `;
 
@@ -213,45 +221,168 @@ export class MailService {
 
   async sendAppointmentCancelled(appt: AppointmentWithContact) {
     if (!appt.contact) return;
-    const to = appt.contact.email;
-    const subject = 'Votre rendez-vous a été annulé';
+
+    const cancelledDate = this.formatDate(
+      appt.scheduledAt,
+      'America/Guadeloupe',
+    );
+
     const html = `
-      <p>Bonjour ${appt.contact.firstName},</p>
-      <p>Votre rendez-vous a bien été annulé.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #dc2626; margin-top: 0;">Rendez-vous annulé ❌</h2>
+        
+        <p>Bonjour <strong>${appt.contact.firstName}</strong>,</p>
+        
+        <p>Votre rendez-vous ${cancelledDate ? `du <strong>${cancelledDate}</strong>` : ''} a bien été annulé.</p>
+        
+        <div style="background-color: #fef2f2; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #dc2626;">
+          <p style="margin: 0; color: #991b1b;">
+            <strong>✅ Confirmation :</strong> Votre rendez-vous a été annulé avec succès. 
+            Vous pouvez reprendre un nouveau rendez-vous à tout moment si nécessaire.
+          </p>
+        </div>
+        
+        <p style="margin-top: 30px;">
+          <a href="${EMAIL_CONFIG.BASE_URL}" style="color: #2563eb; text-decoration: none; font-weight: bold;">
+            📅 Prendre un nouveau rendez-vous
+          </a>
+        </p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <div style="display: flex; align-items: center; font-size: 14px; color: #6b7280;">
+          <img src="${EMAIL_CONFIG.LOGO_URL}" alt="System's Matic" style="width: 40px; height: auto; margin-right: 10px;">
+          <div>
+            <strong>System's Matic</strong> - Service de rendez-vous<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+          </div>
+        </div>
+      </div>
     `;
-    await this.send(to, subject, html);
+    await this.send(appt.contact.email, 'Votre rendez-vous a été annulé', html);
   }
 
   async sendAppointmentReminder(appt: AppointmentWithContact) {
     if (!appt.contact) return;
-    const to = appt.contact.email;
+
     const scheduledDate = this.formatDate(
       appt.scheduledAt,
       'America/Guadeloupe',
     );
-    const subject = 'Rappel : votre rendez-vous approche';
+    const cancelUrl = this.generateActionUrl(
+      appt.id,
+      'cancel',
+      appt.cancellationToken,
+    );
+
     const html = `
-      <p>Bonjour ${appt.contact.firstName},</p>
-      <p>Petit rappel : votre rendez-vous est prévu le <b>${scheduledDate}</b>.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #f59e0b; margin-top: 0;">Rappel : votre rendez-vous approche ⏰</h2>
+        
+        <p>Bonjour <strong>${appt.contact.firstName}</strong>,</p>
+        
+        <p>Petit rappel concernant votre rendez-vous qui approche !</p>
+        
+        <div style="background-color: #fffbeb; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #f59e0b;">
+          <h3 style="margin-top: 0; color: #92400e;">📅 Votre rendez-vous</h3>
+          <p style="font-size: 18px; font-weight: bold; color: #92400e;">
+            ${scheduledDate}
+          </p>
+          ${appt.reason ? `<p><strong>Motif :</strong> ${appt.reason}</p>` : ''}
+        </div>
+        
+        <div style="background-color: #ecfeff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #06b6d4;">
+          <p style="margin: 0; color: #155e75;">
+            <strong>ℹ️ Rappel :</strong> Si vous devez annuler ce rendez-vous, pensez à le faire au moins 24h à l'avance.
+          </p>
+        </div>
+        
+        <p style="margin-top: 30px;">
+          <a href="${cancelUrl}" style="color: #dc2626; text-decoration: none; font-weight: bold;">
+            🚫 Annuler ce rendez-vous
+          </a>
+        </p>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <div style="display: flex; align-items: center; font-size: 14px; color: #6b7280;">
+          <img src="${EMAIL_CONFIG.LOGO_URL}" alt="System's Matic" style="width: 40px; height: auto; margin-right: 10px;">
+          <div>
+            <strong>System's Matic</strong> - Service de rendez-vous<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+          </div>
+        </div>
+      </div>
     `;
-    await this.send(to, subject, html);
+    await this.send(
+      appt.contact.email,
+      'Rappel : votre rendez-vous approche',
+      html,
+    );
   }
 
   async sendAppointmentRescheduleProposal(appt: AppointmentWithContact) {
     if (!appt.contact) return;
-    const to = appt.contact.email;
+
     const scheduledDate = this.formatDate(
       appt.scheduledAt,
       'America/Guadeloupe',
     );
-    const subject = 'Proposition de reprogrammation de votre rendez-vous';
+    const confirmUrl = this.generateActionUrl(
+      appt.id,
+      'confirm',
+      appt.confirmationToken,
+    );
+    const cancelUrl = this.generateActionUrl(
+      appt.id,
+      'cancel',
+      appt.cancellationToken,
+    );
+
     const html = `
-      <p>Bonjour ${appt.contact.firstName},</p>
-      <p>Nous vous proposons de reprogrammer votre rendez-vous au <b>${scheduledDate}</b>.</p>
-      <p>Pour confirmer cette nouvelle date : <a href="${process.env.PUBLIC_URL}/appointments/${appt.id}/confirm?token=${appt.confirmationToken}">Confirmer</a></p>
-      <p>Pour refuser et annuler : <a href="${process.env.PUBLIC_URL}/appointments/${appt.id}/cancel?token=${appt.cancellationToken}">Refuser</a></p>
-      <p>Si vous refusez, vous devrez prendre un nouveau rendez-vous manuellement.</p>
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2 style="color: #7c3aed; margin-top: 0;">Proposition de reprogrammation 🔄</h2>
+        
+        <p>Bonjour <strong>${appt.contact.firstName}</strong>,</p>
+        
+        <p>Nous vous proposons de reprogrammer votre rendez-vous à une nouvelle date qui pourrait mieux vous convenir.</p>
+        
+        <div style="background-color: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #7c3aed;">
+          <h3 style="margin-top: 0; color: #5b21b6;">📅 Nouvelle date proposée</h3>
+          <p style="font-size: 18px; font-weight: bold; color: #5b21b6;">
+            ${scheduledDate}
+          </p>
+          ${appt.reason ? `<p><strong>Motif :</strong> ${appt.reason}</p>` : ''}
+        </div>
+        
+        <div style="background-color: #f0f9ff; padding: 15px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0ea5e9;">
+          <p style="margin: 0; color: #0c4a6e;">
+            <strong>ℹ️ À noter :</strong> Si vous refusez cette proposition, vous devrez prendre un nouveau rendez-vous manuellement depuis notre site.
+          </p>
+        </div>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${confirmUrl}" style="background-color: #059669; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 0 10px; display: inline-block;">
+            ✅ Accepter cette date
+          </a>
+          <br><br>
+          <a href="${cancelUrl}" style="color: #dc2626; text-decoration: none; font-weight: bold;">
+            ❌ Refuser et annuler
+          </a>
+        </div>
+        
+        <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+        <div style="display: flex; align-items: center; font-size: 14px; color: #6b7280;">
+          <img src="${EMAIL_CONFIG.LOGO_URL}" alt="System's Matic" style="width: 40px; height: auto; margin-right: 10px;">
+          <div>
+            <strong>System's Matic</strong> - Service de rendez-vous<br>
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre.
+          </div>
+        </div>
+      </div>
     `;
-    await this.send(to, subject, html);
+    await this.send(
+      appt.contact.email,
+      'Proposition de reprogrammation de votre rendez-vous',
+      html,
+    );
   }
 }
