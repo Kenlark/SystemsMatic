@@ -27,7 +27,6 @@
   transform: scale(0.95);
 }
 
-
 @keyframes pulse {
   0% {
     box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
@@ -115,7 +114,6 @@
   background: rgba(255, 255, 255, 0.2);
 }
 
-
 .chatbox__messages {
   max-height: 600px;
   overflow-y: auto;
@@ -199,7 +197,6 @@
   color: #94a3b8;
 }
 
-
 .typing-indicator {
   display: flex;
   gap: 4px;
@@ -235,7 +232,6 @@
     opacity: 1;
   }
 }
-
 
 .message__options {
   display: flex;
@@ -281,7 +277,6 @@
   border-color: #e2e8f0;
   transform: none;
 }
-
 
 .message--user-options .message__option-btn {
   background: #f0f9ff;
@@ -336,7 +331,6 @@
   transform: translateY(0);
 }
 
-
 @media (max-width: 768px) {
   .chat-icon {
     bottom: 15px;
@@ -362,6 +356,10 @@
     right: 10px;
     width: 50px;
     height: 50px;
+  }
+
+  .chatbox__messages {
+    max-height: 500px;
   }
 
   .chatbox {
@@ -393,7 +391,6 @@
   }
 }
 
-
 @keyframes slideInUp {
   from {
     transform: translateY(100%);
@@ -404,7 +401,6 @@
     opacity: 1;
   }
 }
-
 
 @keyframes slideOutDown {
   from {
