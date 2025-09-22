@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { BullModule } from '@nestjs/bullmq';
+import { QueueMonitorService } from './queue-monitor.service';
 
 const connection = process.env.REDIS_URL
   ? { url: process.env.REDIS_URL }
@@ -16,6 +17,7 @@ const connection = process.env.REDIS_URL
     }),
     BullModule.registerQueue({ name: 'reminders' }),
   ],
-  exports: [BullModule],
+  providers: [QueueMonitorService],
+  exports: [BullModule, QueueMonitorService],
 })
 export class QueueModule {}

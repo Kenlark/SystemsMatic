@@ -90,27 +90,4 @@ export class AuthController {
       user: result.user,
     });
   }
-
-  @Get('debug-cookies')
-  async debugCookies(@Request() req, @Res() res: Response) {
-    return res.status(HttpStatus.OK).json({
-      cookies: req.cookies,
-      headers: req.headers,
-      userAgent: req.get('User-Agent'),
-      origin: req.get('Origin'),
-      referer: req.get('Referer'),
-    });
-  }
-
-  @Get('test-cookies')
-  async testCookies(@Res() res: Response) {
-    return res.status(HttpStatus.OK).json({
-      message: 'Cookie de test défini',
-      cookieOptions: getCookieOptions(),
-      environment: {
-        NODE_ENV: process.env.NODE_ENV,
-        CORS_ORIGIN: process.env.CORS_ORIGIN,
-      },
-    });
-  }
 }

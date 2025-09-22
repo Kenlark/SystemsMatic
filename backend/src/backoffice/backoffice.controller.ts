@@ -12,6 +12,7 @@ import {
 } from '@nestjs/common';
 import { AppointmentsService } from '../appointments/appointments.service';
 import { QuotesService } from '../quotes/quotes.service';
+import { QueueMonitorService } from '../queue/queue-monitor.service';
 import { AppointmentStatus } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
@@ -23,6 +24,7 @@ export class BackofficeController {
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly quotesService: QuotesService,
+    private readonly queueMonitorService: QueueMonitorService,
   ) {}
 
   @Get('appointments')
@@ -177,5 +179,14 @@ export class BackofficeController {
       lastName: req.user.lastName,
       role: req.user.role,
     };
+  }
+  @Get('queue/stats')
+  async getQueueStats() {
+    return this.queueMonitorService.getQueueStats();
+  }
+
+  @Get('queue/health')
+  async getQueueHealth() {
+    return this.queueMonitorService.getQueueHealth();
   }
 }

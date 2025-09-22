@@ -23,8 +23,6 @@ export class ReminderProcessor extends WorkerHost {
 
     await this.mail.sendAppointmentReminder(appt);
 
-    // Note: Le log d'email ci-dessous trace l'envoi du rappel
-
     // Créer un log d'email
     await this.prisma.emailLog.create({
       data: {
@@ -34,6 +32,11 @@ export class ReminderProcessor extends WorkerHost {
         template: 'reminder',
         meta: { sentBy: 'system' },
       },
+    });
+
+    await this.prisma.reminder.update({
+      where: { appointmentId },
+      data: { sentAt: new Date() },
     });
   }
 }
