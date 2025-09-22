@@ -170,4 +170,75 @@ export class QuotesController {
       );
     }
   }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/accept')
+  async acceptQuote(
+    @Param('id') id: string,
+    @Body() body: { document?: string; validUntil?: string },
+  ) {
+    try {
+      const quote = await this.quotesService.findOne(id);
+      if (!quote) {
+        throw new HttpException('Devis introuvable', HttpStatus.NOT_FOUND);
+      }
+
+      if (quote.status !== 'PENDING' && quote.status !== 'PROCESSING') {
+        throw new HttpException(
+          'Seuls les devis en attente ou en cours de traitement peuvent être acceptés',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return await this.quotesService.acceptQuote(id, body);
+    } catch (error) {
+      this.logger.error(`Erreur lors de l'acceptation du devis ${id}:`, error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        "Erreur lors de l'acceptation du devis",
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Put(':id/reject')
+  async rejectQuote(
+    @Param('id') id: string,
+    @Body() body: { rejectionReason: string },
+  ) {
+    try {
+      const quote = await this.quotesService.findOne(id);
+      if (!quote) {
+        throw new HttpException('Devis introuvable', HttpStatus.NOT_FOUND);
+      }
+
+      if (quote.status !== 'PENDING' && quote.status !== 'PROCESSING') {
+        throw new HttpException(
+          'Seuls les devis en attente ou en cours de traitement peuvent être rejetés',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      if (!body.rejectionReason || body.rejectionReason.trim().length === 0) {
+        throw new HttpException(
+          'La raison du refus est obligatoire',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      return await this.quotesService.rejectQuote(id, body.rejectionReason);
+    } catch (error) {
+      this.logger.error(`Erreur lors du rejet du devis ${id}:`, error);
+      if (error instanceof HttpException) {
+        throw error;
+      }
+      throw new HttpException(
+        'Erreur lors du rejet du devis',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
+  }
 }

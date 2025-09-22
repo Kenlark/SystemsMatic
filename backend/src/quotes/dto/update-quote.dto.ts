@@ -12,4 +12,8 @@ export class UpdateQuoteDto {
   @IsOptional()
   @IsString()
   quoteDocument?: string;
+
+  @IsOptional()
+  @IsString()
+  rejectionReason?: string;
 }

@@ -133,6 +133,9 @@ model Quote {
   quoteValidUntil DateTime? @db.Timestamptz(6) // Date d'expiration
   quoteDocument  String?  // URL ou chemin vers le document PDF (optionnel)
   
+  // Gestion du rejet
+  rejectionReason String? // Raison du refus (si status = REJECTED)
+  
   // Traçabilité 
   processedAt DateTime? @db.Timestamptz(6) // Date de traitement
   sentAt      DateTime? @db.Timestamptz(6) // Date d'envoi du devis

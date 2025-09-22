@@ -137,6 +137,22 @@ export class BackofficeController {
     return this.quotesService.updateStatus(id, data.status, data.data);
   }
 
+  @Put('quotes/:id/accept')
+  async acceptQuote(
+    @Param('id') id: string,
+    @Body() body: { document?: string; validUntil?: string },
+  ) {
+    return this.quotesService.acceptQuote(id, body);
+  }
+
+  @Put('quotes/:id/reject')
+  async rejectQuote(
+    @Param('id') id: string,
+    @Body() body: { rejectionReason: string },
+  ) {
+    return this.quotesService.rejectQuote(id, body.rejectionReason);
+  }
+
   // === DASHBOARD GLOBAL ===
 
   @Get('dashboard')

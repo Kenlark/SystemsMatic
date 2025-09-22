@@ -59,6 +59,16 @@ export interface QuoteUpdate {
   status?: string;
   quoteValidUntil?: string;
   quoteDocument?: string;
+  rejectionReason?: string;
+}
+
+export interface QuoteAcceptData {
+  document?: string;
+  validUntil?: string;
+}
+
+export interface QuoteRejectData {
+  rejectionReason: string;
 }
 
 // API du backoffice
@@ -155,6 +165,18 @@ export const backofficeApi = {
   // Récupérer le dashboard global (RDV + Devis)
   getDashboard: async () => {
     const response = await backofficeClient.get("/dashboard");
+    return response.data;
+  },
+
+  // Accepter un devis
+  acceptQuote: async (id: string, data?: QuoteAcceptData) => {
+    const response = await backofficeClient.put(`/quotes/${id}/accept`, data);
+    return response.data;
+  },
+
+  // Rejeter un devis
+  rejectQuote: async (id: string, data: QuoteRejectData) => {
+    const response = await backofficeClient.put(`/quotes/${id}/reject`, data);
     return response.data;
   },
 };

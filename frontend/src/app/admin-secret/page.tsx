@@ -1,7 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { backofficeApi, Quote, QuoteUpdate } from "@/lib/backoffice-api";
+import {
+  backofficeApi,
+  Quote,
+  QuoteUpdate,
+  QuoteAcceptData,
+  QuoteRejectData,
+} from "@/lib/backoffice-api";
 import { authApi } from "@/lib/auth-api";
 import { Appointment, AppointmentStatus } from "@/types/appointment";
 import { formatGuadeloupeDateTime } from "@/lib/date-utils";
@@ -42,6 +48,10 @@ export default function AdminPage() {
   const [quotesFilter, setQuotesFilter] = useState<string>("");
   const [editingQuote, setEditingQuote] = useState<Quote | null>(null);
   const [isQuoteModalOpen, setIsQuoteModalOpen] = useState(false);
+  const [isAcceptModalOpen, setIsAcceptModalOpen] = useState(false);
+  const [isRejectModalOpen, setIsRejectModalOpen] = useState(false);
+  const [selectedQuoteForAction, setSelectedQuoteForAction] =
+    useState<Quote | null>(null);
 
   // États pour le rafraîchissement automatique
   const [lastRefresh, setLastRefresh] = useState<Date>(new Date());
@@ -301,7 +311,51 @@ export default function AdminPage() {
   const handleSaveQuote = async (updatedData: QuoteUpdate) => {
     if (!editingQuote) return;
     try {
-      await backofficeApi.updateQuote(editingQuote.id, updatedData);
+      // Validation spéciale pour le statut "SENT"
+      if (updatedData.status === "SENT") {
+        const hasValidUntil =
+          updatedData.quoteValidUntil &&
+          updatedData.quoteValidUntil.trim() !== "";
+        const hasDocument =
+          updatedData.quoteDocument && updatedData.quoteDocument.trim() !== "";
+
+        if (!hasValidUntil || !hasDocument) {
+          showError(
+            "Pour marquer un devis comme 'Envoyé', vous devez obligatoirement renseigner une date de validité ET un document PDF."
+          );
+          return;
+        }
+      }
+
+      // Filtrer les champs vides pour éviter les erreurs de validation
+      const filteredData: QuoteUpdate = {};
+
+      if (updatedData.status) {
+        filteredData.status = updatedData.status;
+      }
+
+      if (
+        updatedData.quoteValidUntil &&
+        updatedData.quoteValidUntil.trim() !== ""
+      ) {
+        filteredData.quoteValidUntil = updatedData.quoteValidUntil;
+      }
+
+      if (
+        updatedData.quoteDocument &&
+        updatedData.quoteDocument.trim() !== ""
+      ) {
+        filteredData.quoteDocument = updatedData.quoteDocument;
+      }
+
+      if (
+        updatedData.rejectionReason &&
+        updatedData.rejectionReason.trim() !== ""
+      ) {
+        filteredData.rejectionReason = updatedData.rejectionReason;
+      }
+
+      await backofficeApi.updateQuote(editingQuote.id, filteredData);
       showSuccess("Devis mis à jour avec succès");
       setIsQuoteModalOpen(false);
       setEditingQuote(null);
@@ -310,6 +364,59 @@ export default function AdminPage() {
     } catch (error) {
       console.error("Erreur lors de la mise à jour du devis:", error);
       showError("Erreur lors de la mise à jour du devis");
+    }
+  };
+
+  const handleAcceptQuote = (quote: Quote) => {
+    setSelectedQuoteForAction(quote);
+    setIsAcceptModalOpen(true);
+  };
+
+  const handleRejectQuote = (quote: Quote) => {
+    setSelectedQuoteForAction(quote);
+    setIsRejectModalOpen(true);
+  };
+
+  const confirmAcceptQuote = async (data: QuoteAcceptData) => {
+    if (!selectedQuoteForAction) return;
+    try {
+      // Filtrer les champs vides
+      const filteredData: QuoteAcceptData = {};
+
+      if (data.document && data.document.trim() !== "") {
+        filteredData.document = data.document;
+      }
+
+      if (data.validUntil && data.validUntil.trim() !== "") {
+        filteredData.validUntil = data.validUntil;
+      }
+
+      await backofficeApi.acceptQuote(selectedQuoteForAction.id, filteredData);
+      showSuccess(
+        "Devis accepté avec succès. Un email a été envoyé au client."
+      );
+      setIsAcceptModalOpen(false);
+      setSelectedQuoteForAction(null);
+      fetchQuotes();
+      fetchQuotesStats();
+    } catch (error) {
+      console.error("Erreur lors de l'acceptation du devis:", error);
+      showError("Erreur lors de l'acceptation du devis");
+    }
+  };
+
+  const confirmRejectQuote = async (data: QuoteRejectData) => {
+    if (!selectedQuoteForAction) return;
+    try {
+      await backofficeApi.rejectQuote(selectedQuoteForAction.id, data);
+      showSuccess("Devis rejeté avec succès. Un email a été envoyé au client.");
+      setIsRejectModalOpen(false);
+      setSelectedQuoteForAction(null);
+      fetchQuotes();
+      fetchQuotesStats();
+    } catch (error) {
+      console.error("Erreur lors du rejet du devis:", error);
+      showError("Erreur lors du rejet du devis");
     }
   };
 
@@ -948,23 +1055,20 @@ export default function AdminPage() {
                       </button>
                     )}
 
-                    {quote.status === "SENT" && (
+                    {(quote.status === "PENDING" ||
+                      quote.status === "PROCESSING") && (
                       <>
                         <button
-                          onClick={() =>
-                            updateQuoteStatus(quote.id, "ACCEPTED")
-                          }
+                          onClick={() => handleAcceptQuote(quote)}
                           className="action-button accept"
                         >
-                          Accepté
+                          Accepter
                         </button>
                         <button
-                          onClick={() =>
-                            updateQuoteStatus(quote.id, "REJECTED")
-                          }
+                          onClick={() => handleRejectQuote(quote)}
                           className="action-button reject"
                         >
-                          Refusé
+                          Rejeter
                         </button>
                       </>
                     )}
@@ -983,6 +1087,30 @@ export default function AdminPage() {
             onClose={() => {
               setIsQuoteModalOpen(false);
               setEditingQuote(null);
+            }}
+          />
+        )}
+
+        {/* Modal d'acceptation des devis */}
+        {isAcceptModalOpen && selectedQuoteForAction && (
+          <QuoteAcceptModal
+            quote={selectedQuoteForAction}
+            onAccept={confirmAcceptQuote}
+            onClose={() => {
+              setIsAcceptModalOpen(false);
+              setSelectedQuoteForAction(null);
+            }}
+          />
+        )}
+
+        {/* Modal de rejet des devis */}
+        {isRejectModalOpen && selectedQuoteForAction && (
+          <QuoteRejectModal
+            quote={selectedQuoteForAction}
+            onReject={confirmRejectQuote}
+            onClose={() => {
+              setIsRejectModalOpen(false);
+              setSelectedQuoteForAction(null);
             }}
           />
         )}
@@ -1047,7 +1175,12 @@ function QuoteEditModal({
             </div>
 
             <div className="quote-form-group">
-              <label>Valide jusqu'au</label>
+              <label>
+                Valide jusqu'au
+                {formData.status === "SENT" && (
+                  <span style={{ color: "#dc2626", marginLeft: "4px" }}>*</span>
+                )}
+              </label>
               <input
                 type="date"
                 value={formData.quoteValidUntil}
@@ -1057,11 +1190,22 @@ function QuoteEditModal({
                     quoteValidUntil: e.target.value,
                   }))
                 }
+                required={formData.status === "SENT"}
               />
+              {formData.status === "SENT" && (
+                <small style={{ color: "#dc2626" }}>
+                  Obligatoire pour le statut "Envoyé"
+                </small>
+              )}
             </div>
 
             <div className="quote-form-group">
-              <label>Document (URL)</label>
+              <label>
+                Document (URL)
+                {formData.status === "SENT" && (
+                  <span style={{ color: "#dc2626", marginLeft: "4px" }}>*</span>
+                )}
+              </label>
               <input
                 type="url"
                 value={formData.quoteDocument}
@@ -1072,7 +1216,13 @@ function QuoteEditModal({
                   }))
                 }
                 placeholder="https://exemple.com/devis.pdf"
+                required={formData.status === "SENT"}
               />
+              {formData.status === "SENT" && (
+                <small style={{ color: "#dc2626" }}>
+                  Obligatoire pour le statut "Envoyé"
+                </small>
+              )}
             </div>
           </div>
 
@@ -1081,6 +1231,178 @@ function QuoteEditModal({
               Annuler
             </button>
             <button type="submit">Sauvegarder</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Composant Modal pour l'acceptation des devis
+function QuoteAcceptModal({
+  quote,
+  onAccept,
+  onClose,
+}: {
+  quote: Quote;
+  onAccept: (data: QuoteAcceptData) => void;
+  onClose: () => void;
+}) {
+  const [formData, setFormData] = useState<QuoteAcceptData>({
+    document: "",
+    validUntil: "",
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onAccept(formData);
+  };
+
+  return (
+    <div className="quote-modal-overlay" onClick={onClose}>
+      <div className="quote-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="quote-modal-header">
+          <h4>
+            Accepter le devis - {quote.contact.firstName}{" "}
+            {quote.contact.lastName}
+          </h4>
+          <button className="quote-modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="quote-modal-body">
+            <div className="quote-accept-info">
+              <p>
+                <strong>⚠️ Attention :</strong> En acceptant ce devis, un email
+                sera automatiquement envoyé au client pour l'informer que vous
+                allez le recontacter dans les plus brefs délais.
+              </p>
+            </div>
+
+            <div className="quote-form-group">
+              <label>Document PDF (optionnel)</label>
+              <input
+                type="url"
+                value={formData.document || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    document: e.target.value,
+                  }))
+                }
+                placeholder="https://exemple.com/devis.pdf"
+              />
+              <small>
+                Si vous avez un devis PDF à joindre, renseignez l'URL ici
+              </small>
+            </div>
+
+            <div className="quote-form-group">
+              <label>Valide jusqu'au (optionnel)</label>
+              <input
+                type="date"
+                value={formData.validUntil || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    validUntil: e.target.value,
+                  }))
+                }
+              />
+              <small>Date d'expiration du devis (optionnel)</small>
+            </div>
+
+            <div className="quote-project-summary">
+              <h5>Résumé du projet :</h5>
+              <p>{quote.projectDescription}</p>
+            </div>
+          </div>
+
+          <div className="quote-modal-actions">
+            <button type="button" onClick={onClose}>
+              Annuler
+            </button>
+            <button type="submit" className="accept-button">
+              ✅ Accepter le devis
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// Composant Modal pour le rejet des devis
+function QuoteRejectModal({
+  quote,
+  onReject,
+  onClose,
+}: {
+  quote: Quote;
+  onReject: (data: QuoteRejectData) => void;
+  onClose: () => void;
+}) {
+  const [rejectionReason, setRejectionReason] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rejectionReason.trim()) {
+      alert("Veuillez saisir une raison pour le refus");
+      return;
+    }
+    onReject({ rejectionReason: rejectionReason.trim() });
+  };
+
+  return (
+    <div className="quote-modal-overlay" onClick={onClose}>
+      <div className="quote-modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="quote-modal-header">
+          <h4>
+            Rejeter le devis - {quote.contact.firstName}{" "}
+            {quote.contact.lastName}
+          </h4>
+          <button className="quote-modal-close" onClick={onClose}>
+            ×
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="quote-modal-body">
+            <div className="quote-reject-info">
+              <p>
+                <strong>⚠️ Attention :</strong> En rejetant ce devis, un email
+                sera automatiquement envoyé au client avec la raison du refus
+                que vous allez indiquer.
+              </p>
+            </div>
+
+            <div className="quote-form-group">
+              <label>Raison du refus *</label>
+              <textarea
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                placeholder="Expliquez pourquoi ce devis ne peut pas être accepté..."
+                rows={4}
+                required
+              />
+              <small>Cette raison sera envoyée au client par email</small>
+            </div>
+
+            <div className="quote-project-summary">
+              <h5>Projet rejeté :</h5>
+              <p>{quote.projectDescription}</p>
+            </div>
+          </div>
+
+          <div className="quote-modal-actions">
+            <button type="button" onClick={onClose}>
+              Annuler
+            </button>
+            <button type="submit" className="reject-button">
+              ❌ Rejeter le devis
+            </button>
           </div>
         </form>
       </div>
