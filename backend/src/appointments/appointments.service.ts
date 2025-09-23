@@ -10,9 +10,9 @@ import { ReminderScheduler } from './queues/reminder.scheduler';
 import { AppointmentStatus, AppointmentReason } from '@prisma/client';
 import { CreateAppointmentDto } from './dto/create-appointments.dto';
 import { ConfirmAppointmentDto } from './dto/confirm-appointments.dto';
-import * as dayjs from 'dayjs';
-import * as utc from 'dayjs/plugin/utc';
-import * as timezone from 'dayjs/plugin/timezone';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import timezone from 'dayjs/plugin/timezone';
 
 // Configuration des plugins dayjs pour la gestion des dates
 dayjs.extend(utc);
