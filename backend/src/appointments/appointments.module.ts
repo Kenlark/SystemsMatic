@@ -6,12 +6,22 @@ import { QueueModule } from '../queue/queue.module';
 import { ReminderProcessor } from './queues/reminder.processor';
 import { ReminderScheduler } from './queues/reminder.scheduler';
 import { MailModule } from '../mail/mail.module';
+import {
+  AppointmentCrudService,
+  AppointmentValidationService,
+  AppointmentReminderService,
+  AppointmentAdminService,
+} from './services';
 
 @Module({
   imports: [QueueModule, MailModule],
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
+    AppointmentCrudService,
+    AppointmentValidationService,
+    AppointmentReminderService,
+    AppointmentAdminService,
     PrismaService,
     ReminderProcessor,
     ReminderScheduler,
