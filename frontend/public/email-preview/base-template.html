@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Template de Base - SystemsMatic</title>
+    <link rel="stylesheet" href="styles/base.css" />
+    <link rel="stylesheet" href="styles/editor.css" />
+  </head>
+  <body>
+    <div class="controls">
+      <h2>🎛️ Contrôles de Données d'Exemple</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        "
+      >
+        <div class="control-group">
+          <label for="contactName">Nom du contact</label>
+          <input
+            type="text"
+            id="contactName"
+            value="Jean Dupont"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            value="jean.dupont@example.com"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="phone">Téléphone</label>
+          <input
+            type="tel"
+            id="phone"
+            value="+33 6 12 34 56 78"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="scheduledDate">Date du rendez-vous</label>
+          <input
+            type="text"
+            id="scheduledDate"
+            value="Lundi 15 janvier 2024 à 14h30"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="reason">Motif</label>
+          <input
+            type="text"
+            id="reason"
+            value="Maintenance système informatique"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="message">Message</label>
+          <textarea id="message" onchange="updatePreview()">
+Bonjour, j'aimerais programmer une intervention pour la maintenance de nos serveurs. Nous avons remarqué quelques ralentissements récents.</textarea
+          >
+        </div>
+      </div>
+      <div style="margin-top: 15px">
+        <button class="btn" onclick="resetData()">🔄 Réinitialiser</button>
+        <button class="btn btn-secondary" onclick="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-panel">
+        <div class="editor-header">📝 Code HTML/CSS</div>
+        <div class="editor-content">
+          <textarea
+            id="codeEditor"
+            class="code-editor"
+            onchange="updatePreview()"
+          >
+<!-- Remplacez ce contenu par votre template HTML -->
+<div class="email-container">
+    <div class="email-header">
+        <img src="https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg" 
+             alt="SystemsMatic" class="email-logo">
+        <div class="email-header-title">SystemsMatic</div>
+    </div>
+
+    <div class="email-content">
+        <div class="greeting">Bonjour <span id="contactNameDisplay">Jean Dupont</span>,</div>
+        
+        <div class="paragraph">
+            Excellente nouvelle ! Votre rendez-vous a été confirmé.
+        </div>
+
+        <div class="info-box success">
+            <div class="info-box-title">📅 Détails du rendez-vous</div>
+            <div class="info-box-text">
+                <div style="font-size: 18px; font-weight: bold; margin: 0 0 8px 0;" id="scheduledDateDisplay">
+                    Lundi 15 janvier 2024 à 14h30
+                </div>
+                <div id="reasonDisplay">
+                    <strong>Motif :</strong><br>
+                    Maintenance système informatique
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box warning">
+            <div class="info-box-title">⚠️ Important</div>
+            <div class="info-box-text">
+                Vous ne pouvez annuler ce rendez-vous que jusqu'à 24h avant l'heure prévue. 
+                Passé ce délai, veuillez nous contacter directement.
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="action-button danger">🚫 Annuler ce rendez-vous</a>
+        </div>
+
+        <div class="footer-note">
+            En cas de question urgente, n'hésitez pas à nous contacter directement.
+        </div>
+    </div>
+
+    <hr class="email-hr">
+
+    <div class="email-footer">
+        <div class="email-footer-text">SystemsMatic</div>
+        <div class="email-footer-text">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+        </div>
+    </div>
+</div>
+                </textarea
+          >
+        </div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-header">👁️ Prévisualisation</div>
+        <div class="preview-content">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePreview() {
+        const code = document.getElementById("codeEditor").value;
+        const preview = document.getElementById("preview");
+
+        // Mettre à jour les données dynamiques
+        const contactName = document.getElementById("contactName").value;
+        const email = document.getElementById("email").value;
+        const phone = document.getElementById("phone").value;
+        const scheduledDate = document.getElementById("scheduledDate").value;
+        const reason = document.getElementById("reason").value;
+        const message = document.getElementById("message").value;
+
+        // Remplacer les placeholders dans le code
+        let updatedCode = code
+          .replace(/id="contactNameDisplay"/g, `id="contactNameDisplay"`)
+          .replace(/Jean Dupont/g, contactName)
+          .replace(/jean\.dupont@example\.com/g, email)
+          .replace(/\+33 6 12 34 56 78/g, phone)
+          .replace(/Lundi 15 janvier 2024 à 14h30/g, scheduledDate)
+          .replace(/Maintenance système informatique/g, reason);
+
+        preview.innerHTML = updatedCode;
+
+        // Mettre à jour les éléments avec des IDs spécifiques
+        const contactNameDisplay = preview.querySelector("#contactNameDisplay");
+        if (contactNameDisplay) contactNameDisplay.textContent = contactName;
+
+        const scheduledDateDisplay = preview.querySelector(
+          "#scheduledDateDisplay"
+        );
+        if (scheduledDateDisplay)
+          scheduledDateDisplay.textContent = scheduledDate;
+
+        const reasonDisplay = preview.querySelector("#reasonDisplay");
+        if (reasonDisplay)
+          reasonDisplay.innerHTML = `<strong>Motif :</strong><br>${reason}`;
+      }
+
+      function resetData() {
+        document.getElementById("contactName").value = "Jean Dupont";
+        document.getElementById("email").value = "jean.dupont@example.com";
+        document.getElementById("phone").value = "+33 6 12 34 56 78";
+        document.getElementById("scheduledDate").value =
+          "Lundi 15 janvier 2024 à 14h30";
+        document.getElementById("reason").value =
+          "Maintenance système informatique";
+        document.getElementById("message").value =
+          "Bonjour, j'aimerais programmer une intervention pour la maintenance de nos serveurs. Nous avons remarqué quelques ralentissements récents.";
+        updatePreview();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("codeEditor").value;
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copié dans le presse-papiers !");
+        });
+      }
+
+      // Initialiser la prévisualisation
+      updatePreview();
+    </script>
+  </body>
+</html>

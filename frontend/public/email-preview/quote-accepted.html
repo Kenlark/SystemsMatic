@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Devis Accepté - SystemsMatic</title>
+        <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/editor.css">
+  </head>
+  <body>
+    <div class="controls">
+      <a href="index.html" class="back-link">← Retour à l'index</a>
+      <h2>✅ Template : Devis Accepté</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        "
+      >
+        <div class="control-group">
+          <label for="contactName">Nom du contact</label>
+          <input
+            type="text"
+            id="contactName"
+            value="Jean Dupont"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="quoteAmount">Montant du devis</label>
+          <input
+            type="text"
+            id="quoteAmount"
+            value="2 500,00 €"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="projectDescription">Description du projet</label>
+          <input
+            type="text"
+            id="projectDescription"
+            value="Modernisation infrastructure informatique"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="nextStepsUrl">URL des prochaines étapes</label>
+          <input
+            type="text"
+            id="nextStepsUrl"
+            value="https://systemsmatic.com/next-steps/12345"
+            onchange="updatePreview()"
+          />
+        </div>
+      </div>
+      <div style="margin-top: 15px">
+        <button class="btn" onclick="resetData()">🔄 Réinitialiser</button>
+        <button class="btn btn-secondary" onclick="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-panel">
+        <div class="editor-header">📝 Code HTML/CSS</div>
+        <div class="editor-content">
+          <textarea
+            id="codeEditor"
+            class="code-editor"
+            onchange="updatePreview()"
+          >
+<div class="email-container">
+    <div class="email-header">
+        <img src="https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg" 
+             alt="SystemsMatic" class="email-logo">
+        <div class="email-header-title">SystemsMatic</div>
+    </div>
+
+    <div class="email-content">
+        <div class="greeting">Bonjour <span id="contactNameDisplay">Jean Dupont</span>,</div>
+        
+        <div class="paragraph">
+            Excellente nouvelle ! Nous avons bien reçu votre acceptation de notre devis. 
+            Nous sommes ravis de pouvoir vous accompagner dans ce projet.
+        </div>
+
+        <div class="info-box success">
+            <div class="info-box-title">🎉 Devis accepté</div>
+            <div class="info-box-text">
+                <p><strong>Projet :</strong><br>
+                <span id="projectDescriptionDisplay">Modernisation infrastructure informatique</span></p>
+                
+                <p><strong>Montant accepté :</strong><br>
+                <span id="quoteAmountDisplay" style="font-size: 18px; font-weight: bold; color: #059669;">
+                    2 500,00 €
+                </span></p>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <div class="info-box-title">📋 Prochaines étapes</div>
+            <div class="info-box-text">
+                📞 Contact sous 24h pour planifier l'intervention<br>
+                📅 Définition des créneaux disponibles<br>
+                📋 Préparation du matériel et des équipes<br>
+                🚀 Début des travaux selon planning
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="action-button primary" id="nextStepsButton">📋 Voir les prochaines étapes</a>
+        </div>
+
+        <div class="footer-note">
+            Merci pour votre confiance. Nous nous engageons à vous fournir un service de qualité.
+        </div>
+    </div>
+
+    <hr class="email-hr">
+
+    <div class="email-footer">
+        <div class="email-footer-text">SystemsMatic</div>
+        <div class="email-footer-text">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+        </div>
+    </div>
+</div>
+                </textarea
+          >
+        </div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-header">👁️ Prévisualisation</div>
+        <div class="preview-content">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePreview() {
+        const code = document.getElementById("codeEditor").value;
+        const preview = document.getElementById("preview");
+
+        // Mettre à jour les données dynamiques
+        const contactName = document.getElementById("contactName").value;
+        const quoteAmount = document.getElementById("quoteAmount").value;
+        const projectDescription =
+          document.getElementById("projectDescription").value;
+        const nextStepsUrl = document.getElementById("nextStepsUrl").value;
+
+        preview.innerHTML = code;
+
+        // Mettre à jour les éléments avec des IDs spécifiques
+        const contactNameDisplay = preview.querySelector("#contactNameDisplay");
+        if (contactNameDisplay) contactNameDisplay.textContent = contactName;
+
+        const quoteAmountDisplay = preview.querySelector("#quoteAmountDisplay");
+        if (quoteAmountDisplay) quoteAmountDisplay.textContent = quoteAmount;
+
+        const projectDescriptionDisplay = preview.querySelector(
+          "#projectDescriptionDisplay"
+        );
+        if (projectDescriptionDisplay)
+          projectDescriptionDisplay.textContent = projectDescription;
+
+        const nextStepsButton = preview.querySelector("#nextStepsButton");
+        if (nextStepsButton) nextStepsButton.href = nextStepsUrl;
+      }
+
+      function resetData() {
+        document.getElementById("contactName").value = "Jean Dupont";
+        document.getElementById("quoteAmount").value = "2 500,00 €";
+        document.getElementById("projectDescription").value =
+          "Modernisation infrastructure informatique";
+        document.getElementById("nextStepsUrl").value =
+          "https://systemsmatic.com/next-steps/12345";
+        updatePreview();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("codeEditor").value;
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copié dans le presse-papiers !");
+        });
+      }
+
+      // Initialiser la prévisualisation
+      updatePreview();
+    </script>
+  </body>
+</html>

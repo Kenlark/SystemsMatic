@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Notification Admin - Nouveau Devis - SystemsMatic</title>
+        <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/editor.css">
+  </head>
+  <body>
+    <div class="controls">
+      <a href="index.html" class="back-link">← Retour à l'index</a>
+      <h2>👨‍💼 Template : Notification Admin - Nouveau Devis</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        "
+      >
+        <div class="control-group">
+          <label for="contactName">Nom du contact</label>
+          <input
+            type="text"
+            id="contactName"
+            value="Jean Dupont"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="contactEmail">Email du contact</label>
+          <input
+            type="email"
+            id="contactEmail"
+            value="jean.dupont@example.com"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="contactPhone">Téléphone du contact</label>
+          <input
+            type="tel"
+            id="contactPhone"
+            value="+33 6 12 34 56 78"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="acceptPhone">Accepte les appels</label>
+          <select id="acceptPhone" onchange="updatePreview()">
+            <option value="true">Oui</option>
+            <option value="false">Non</option>
+          </select>
+        </div>
+        <div class="control-group">
+          <label for="message">Description du projet</label>
+          <textarea id="message" onchange="updatePreview()">
+Bonjour, nous souhaitons moderniser notre infrastructure informatique. Nous avons actuellement 20 postes de travail et 3 serveurs qui nécessitent une mise à jour. Nous aimerions également mettre en place une solution de sauvegarde cloud et améliorer notre sécurité réseau.</textarea
+          >
+        </div>
+        <div class="control-group">
+          <label for="adminUrl">URL du backoffice</label>
+          <input
+            type="text"
+            id="adminUrl"
+            value="https://systemsmatic.com/admin/quotes"
+            onchange="updatePreview()"
+          />
+        </div>
+      </div>
+      <div style="margin-top: 15px">
+        <button class="btn" onclick="resetData()">🔄 Réinitialiser</button>
+        <button class="btn btn-secondary" onclick="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-panel">
+        <div class="editor-header">📝 Code HTML/CSS</div>
+        <div class="editor-content">
+          <textarea
+            id="codeEditor"
+            class="code-editor"
+            onchange="updatePreview()"
+          >
+<div class="email-container">
+    <div class="email-header">
+        <img src="https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg" 
+             alt="SystemsMatic" class="email-logo">
+        <div class="email-header-title">SystemsMatic</div>
+    </div>
+
+    <div class="email-content">
+        <div class="greeting">💰 Nouvelle demande de devis</div>
+        
+        <div class="paragraph">
+            Une nouvelle demande de devis a été soumise et nécessite votre attention.
+        </div>
+
+        <div class="info-box warning">
+            <div class="info-box-title">📋 Détails de la demande</div>
+            <div class="info-box-text">
+                <p><strong>Client :</strong><br>
+                <span id="contactNameDisplay">Jean Dupont</span></p>
+                
+                <p><strong>Email :</strong><br>
+                <span id="contactEmailDisplay">jean.dupont@example.com</span></p>
+                
+                <p id="contactPhoneDisplay" style="display: none;"><strong>Téléphone :</strong><br>
+                <span id="contactPhoneText">+33 6 12 34 56 78</span></p>
+                
+                <p id="phoneAcceptanceDisplay" style="color: #059669;">
+                    <strong>✓</strong><br>
+                    <span id="phoneAcceptanceText">Le client accepte d'être recontacté par téléphone</span>
+                </p>
+            </div>
+        </div>
+
+        <div class="info-box">
+            <div class="info-box-title">📝 Description du projet</div>
+            <div class="info-box-text" style="white-space: pre-wrap; line-height: 1.6;" id="messageDisplay">
+                Bonjour, nous souhaitons moderniser notre infrastructure informatique. Nous avons actuellement 20 postes de travail et 3 serveurs qui nécessitent une mise à jour. Nous aimerions également mettre en place une solution de sauvegarde cloud et améliorer notre sécurité réseau.
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <div class="info-box-title">⚡ Action requise</div>
+            <div class="info-box-text">
+                Veuillez analyser cette demande et préparer un devis détaillé dans les plus brefs délais.
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="action-button primary" id="adminButton">🔧 Accéder au backoffice</a>
+        </div>
+
+        <div class="footer-note">
+            Cette notification a été envoyée automatiquement suite à une nouvelle demande de devis.
+        </div>
+    </div>
+
+    <hr class="email-hr">
+
+    <div class="email-footer">
+        <div class="email-footer-text">SystemsMatic</div>
+        <div class="email-footer-text">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+        </div>
+    </div>
+</div>
+                </textarea
+          >
+        </div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-header">👁️ Prévisualisation</div>
+        <div class="preview-content">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePreview() {
+        const code = document.getElementById("codeEditor").value;
+        const preview = document.getElementById("preview");
+
+        // Mettre à jour les données dynamiques
+        const contactName = document.getElementById("contactName").value;
+        const contactEmail = document.getElementById("contactEmail").value;
+        const contactPhone = document.getElementById("contactPhone").value;
+        const acceptPhone =
+          document.getElementById("acceptPhone").value === "true";
+        const message = document.getElementById("message").value;
+        const adminUrl = document.getElementById("adminUrl").value;
+
+        preview.innerHTML = code;
+
+        // Mettre à jour les éléments avec des IDs spécifiques
+        const contactNameDisplay = preview.querySelector("#contactNameDisplay");
+        if (contactNameDisplay) contactNameDisplay.textContent = contactName;
+
+        const contactEmailDisplay = preview.querySelector(
+          "#contactEmailDisplay"
+        );
+        if (contactEmailDisplay) contactEmailDisplay.textContent = contactEmail;
+
+        const contactPhoneDisplay = preview.querySelector(
+          "#contactPhoneDisplay"
+        );
+        const contactPhoneText = preview.querySelector("#contactPhoneText");
+        if (contactPhone && contactPhone.trim()) {
+          if (contactPhoneDisplay) contactPhoneDisplay.style.display = "block";
+          if (contactPhoneText) contactPhoneText.textContent = contactPhone;
+        } else {
+          if (contactPhoneDisplay) contactPhoneDisplay.style.display = "none";
+        }
+
+        const phoneAcceptanceDisplay = preview.querySelector(
+          "#phoneAcceptanceDisplay"
+        );
+        const phoneAcceptanceText = preview.querySelector(
+          "#phoneAcceptanceText"
+        );
+        if (phoneAcceptanceDisplay && phoneAcceptanceText) {
+          if (acceptPhone) {
+            phoneAcceptanceDisplay.style.color = "#059669";
+            phoneAcceptanceText.textContent =
+              "Le client accepte d'être recontacté par téléphone";
+          } else {
+            phoneAcceptanceDisplay.style.color = "#dc2626";
+            phoneAcceptanceText.textContent =
+              "Le client préfère être contacté par email uniquement";
+          }
+        }
+
+        const messageDisplay = preview.querySelector("#messageDisplay");
+        if (messageDisplay) messageDisplay.textContent = message;
+
+        const adminButton = preview.querySelector("#adminButton");
+        if (adminButton) adminButton.href = adminUrl;
+      }
+
+      function resetData() {
+        document.getElementById("contactName").value = "Jean Dupont";
+        document.getElementById("contactEmail").value =
+          "jean.dupont@example.com";
+        document.getElementById("contactPhone").value = "+33 6 12 34 56 78";
+        document.getElementById("acceptPhone").value = "true";
+        document.getElementById("message").value =
+          "Bonjour, nous souhaitons moderniser notre infrastructure informatique. Nous avons actuellement 20 postes de travail et 3 serveurs qui nécessitent une mise à jour. Nous aimerions également mettre en place une solution de sauvegarde cloud et améliorer notre sécurité réseau.";
+        document.getElementById("adminUrl").value =
+          "https://systemsmatic.com/admin/quotes";
+        updatePreview();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("codeEditor").value;
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copié dans le presse-papiers !");
+        });
+      }
+
+      // Initialiser la prévisualisation
+      updatePreview();
+    </script>
+  </body>
+</html>

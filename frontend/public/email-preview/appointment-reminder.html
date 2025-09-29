@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rappel de Rendez-vous - SystemsMatic</title>
+        <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/editor.css">
+  </head>
+  <body>
+    <div class="controls">
+      <a href="index.html" class="back-link">← Retour à l'index</a>
+      <h2>⏰ Template : Rappel de Rendez-vous</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        "
+      >
+        <div class="control-group">
+          <label for="contactName">Nom du contact</label>
+          <input
+            type="text"
+            id="contactName"
+            value="Jean Dupont"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="scheduledDate">Date du rendez-vous</label>
+          <input
+            type="text"
+            id="scheduledDate"
+            value="Lundi 15 janvier 2024 à 14h30"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="reason">Motif</label>
+          <input
+            type="text"
+            id="reason"
+            value="Maintenance système informatique"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="cancelUrl">URL d'annulation</label>
+          <input
+            type="text"
+            id="cancelUrl"
+            value="https://systemsmatic.com/cancel/12345"
+            onchange="updatePreview()"
+          />
+        </div>
+      </div>
+      <div style="margin-top: 15px">
+        <button class="btn" onclick="resetData()">🔄 Réinitialiser</button>
+        <button class="btn btn-secondary" onclick="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-panel">
+        <div class="editor-header">📝 Code HTML/CSS</div>
+        <div class="editor-content">
+          <textarea
+            id="codeEditor"
+            class="code-editor"
+            onchange="updatePreview()"
+          >
+<div class="email-container">
+    <div class="email-header">
+        <img src="https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg" 
+             alt="SystemsMatic" class="email-logo">
+        <div class="email-header-title">SystemsMatic</div>
+    </div>
+
+    <div class="email-content">
+        <div class="greeting">Bonjour <span id="contactNameDisplay">Jean Dupont</span>,</div>
+        
+        <div class="paragraph">
+            Petit rappel concernant votre rendez-vous qui approche !
+        </div>
+
+        <div class="info-box warning">
+            <div class="info-box-title">📅 Votre rendez-vous</div>
+            <div class="info-box-text">
+                <div style="font-size: 18px; font-weight: bold; margin: 0 0 8px 0;" id="scheduledDateDisplay">
+                    Lundi 15 janvier 2024 à 14h30
+                </div>
+                <div id="reasonDisplay">
+                    <strong>Motif :</strong><br>
+                    Maintenance système informatique
+                </div>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <div class="info-box-title">ℹ️ Rappel</div>
+            <div class="info-box-text">
+                Si vous devez annuler ce rendez-vous, pensez à le faire au moins 24h à l'avance.
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="action-button danger" id="cancelButton">🚫 Annuler ce rendez-vous</a>
+        </div>
+
+        <div class="footer-note">
+            En cas de question urgente, n'hésitez pas à nous contacter directement.
+        </div>
+    </div>
+
+    <hr class="email-hr">
+
+    <div class="email-footer">
+        <div class="email-footer-text">SystemsMatic</div>
+        <div class="email-footer-text">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+        </div>
+    </div>
+</div>
+                </textarea
+          >
+        </div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-header">👁️ Prévisualisation</div>
+        <div class="preview-content">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePreview() {
+        const code = document.getElementById("codeEditor").value;
+        const preview = document.getElementById("preview");
+
+        // Mettre à jour les données dynamiques
+        const contactName = document.getElementById("contactName").value;
+        const scheduledDate = document.getElementById("scheduledDate").value;
+        const reason = document.getElementById("reason").value;
+        const cancelUrl = document.getElementById("cancelUrl").value;
+
+        preview.innerHTML = code;
+
+        // Mettre à jour les éléments avec des IDs spécifiques
+        const contactNameDisplay = preview.querySelector("#contactNameDisplay");
+        if (contactNameDisplay) contactNameDisplay.textContent = contactName;
+
+        const scheduledDateDisplay = preview.querySelector(
+          "#scheduledDateDisplay"
+        );
+        if (scheduledDateDisplay)
+          scheduledDateDisplay.textContent = scheduledDate;
+
+        const reasonDisplay = preview.querySelector("#reasonDisplay");
+        if (reasonDisplay)
+          reasonDisplay.innerHTML = `<strong>Motif :</strong><br>${reason}`;
+
+        const cancelButton = preview.querySelector("#cancelButton");
+        if (cancelButton) cancelButton.href = cancelUrl;
+      }
+
+      function resetData() {
+        document.getElementById("contactName").value = "Jean Dupont";
+        document.getElementById("scheduledDate").value =
+          "Lundi 15 janvier 2024 à 14h30";
+        document.getElementById("reason").value =
+          "Maintenance système informatique";
+        document.getElementById("cancelUrl").value =
+          "https://systemsmatic.com/cancel/12345";
+        updatePreview();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("codeEditor").value;
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copié dans le presse-papiers !");
+        });
+      }
+
+      // Initialiser la prévisualisation
+      updatePreview();
+    </script>
+  </body>
+</html>

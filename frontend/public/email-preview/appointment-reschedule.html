@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Proposition de Report - SystemsMatic</title>
+        <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/editor.css">
+  </head>
+  <body>
+    <div class="controls">
+      <a href="index.html" class="back-link">← Retour à l'index</a>
+      <h2>🔄 Template : Proposition de Report</h2>
+      <div
+        style="
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 15px;
+        "
+      >
+        <div class="control-group">
+          <label for="contactName">Nom du contact</label>
+          <input
+            type="text"
+            id="contactName"
+            value="Jean Dupont"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="originalDate">Date originale</label>
+          <input
+            type="text"
+            id="originalDate"
+            value="Lundi 15 janvier 2024 à 14h30"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="newDate">Nouvelle date proposée</label>
+          <input
+            type="text"
+            id="newDate"
+            value="Mercredi 17 janvier 2024 à 10h00"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="reason">Motif</label>
+          <input
+            type="text"
+            id="reason"
+            value="Maintenance système informatique"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="acceptUrl">URL d'acceptation</label>
+          <input
+            type="text"
+            id="acceptUrl"
+            value="https://systemsmatic.com/accept/12345"
+            onchange="updatePreview()"
+          />
+        </div>
+        <div class="control-group">
+          <label for="declineUrl">URL de refus</label>
+          <input
+            type="text"
+            id="declineUrl"
+            value="https://systemsmatic.com/decline/12345"
+            onchange="updatePreview()"
+          />
+        </div>
+      </div>
+      <div style="margin-top: 15px">
+        <button class="btn" onclick="resetData()">🔄 Réinitialiser</button>
+        <button class="btn btn-secondary" onclick="copyCode()">
+          📋 Copier le code
+        </button>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div class="editor-panel">
+        <div class="editor-header">📝 Code HTML/CSS</div>
+        <div class="editor-content">
+          <textarea
+            id="codeEditor"
+            class="code-editor"
+            onchange="updatePreview()"
+          >
+<div class="email-container">
+    <div class="email-header">
+        <img src="https://res.cloudinary.com/dfqpyuhyj/image/upload/v1758333945/1755694814429f_-_Ramco_tpoknd.jpg" 
+             alt="SystemsMatic" class="email-logo">
+        <div class="email-header-title">SystemsMatic</div>
+    </div>
+
+    <div class="email-content">
+        <div class="greeting">Bonjour <span id="contactNameDisplay">Jean Dupont</span>,</div>
+        
+        <div class="paragraph">
+            Nous vous contactons concernant votre rendez-vous prévu. En raison d'un imprévu de notre côté, 
+            nous souhaiterions vous proposer un nouveau créneau.
+        </div>
+
+        <div class="info-box warning">
+            <div class="info-box-title">📅 Changement de créneau</div>
+            <div class="info-box-text">
+                <p><strong>Date originale :</strong><br>
+                <span id="originalDateDisplay">Lundi 15 janvier 2024 à 14h30</span></p>
+                
+                <p><strong>Nouvelle date proposée :</strong><br>
+                <span id="newDateDisplay" style="font-size: 18px; font-weight: bold; color: #059669;">
+                    Mercredi 17 janvier 2024 à 10h00
+                </span></p>
+                
+                <p><strong>Motif :</strong><br>
+                <span id="reasonDisplay">Maintenance système informatique</span></p>
+            </div>
+        </div>
+
+        <div class="info-box info">
+            <div class="info-box-title">ℹ️ Que faire maintenant ?</div>
+            <div class="info-box-text">
+                Veuillez confirmer si ce nouveau créneau vous convient. Si ce n'est pas le cas, 
+                nous pourrons vous proposer d'autres alternatives.
+            </div>
+        </div>
+
+        <div class="button-container">
+            <a href="#" class="action-button primary" id="acceptButton">✅ Accepter ce créneau</a>
+            <a href="#" class="action-button secondary" id="declineButton">❌ Proposer un autre créneau</a>
+        </div>
+
+        <div class="footer-note">
+            Nous nous excusons pour ce changement et vous remercions de votre compréhension.
+        </div>
+    </div>
+
+    <hr class="email-hr">
+
+    <div class="email-footer">
+        <div class="email-footer-text">SystemsMatic</div>
+        <div class="email-footer-text">
+            Cet email a été envoyé automatiquement, merci de ne pas y répondre directement.
+        </div>
+    </div>
+</div>
+                </textarea
+          >
+        </div>
+      </div>
+
+      <div class="preview-panel">
+        <div class="preview-header">👁️ Prévisualisation</div>
+        <div class="preview-content">
+          <div id="preview"></div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function updatePreview() {
+        const code = document.getElementById("codeEditor").value;
+        const preview = document.getElementById("preview");
+
+        // Mettre à jour les données dynamiques
+        const contactName = document.getElementById("contactName").value;
+        const originalDate = document.getElementById("originalDate").value;
+        const newDate = document.getElementById("newDate").value;
+        const reason = document.getElementById("reason").value;
+        const acceptUrl = document.getElementById("acceptUrl").value;
+        const declineUrl = document.getElementById("declineUrl").value;
+
+        preview.innerHTML = code;
+
+        // Mettre à jour les éléments avec des IDs spécifiques
+        const contactNameDisplay = preview.querySelector("#contactNameDisplay");
+        if (contactNameDisplay) contactNameDisplay.textContent = contactName;
+
+        const originalDateDisplay = preview.querySelector(
+          "#originalDateDisplay"
+        );
+        if (originalDateDisplay) originalDateDisplay.textContent = originalDate;
+
+        const newDateDisplay = preview.querySelector("#newDateDisplay");
+        if (newDateDisplay) newDateDisplay.textContent = newDate;
+
+        const reasonDisplay = preview.querySelector("#reasonDisplay");
+        if (reasonDisplay) reasonDisplay.textContent = reason;
+
+        const acceptButton = preview.querySelector("#acceptButton");
+        if (acceptButton) acceptButton.href = acceptUrl;
+
+        const declineButton = preview.querySelector("#declineButton");
+        if (declineButton) declineButton.href = declineUrl;
+      }
+
+      function resetData() {
+        document.getElementById("contactName").value = "Jean Dupont";
+        document.getElementById("originalDate").value =
+          "Lundi 15 janvier 2024 à 14h30";
+        document.getElementById("newDate").value =
+          "Mercredi 17 janvier 2024 à 10h00";
+        document.getElementById("reason").value =
+          "Maintenance système informatique";
+        document.getElementById("acceptUrl").value =
+          "https://systemsmatic.com/accept/12345";
+        document.getElementById("declineUrl").value =
+          "https://systemsmatic.com/decline/12345";
+        updatePreview();
+      }
+
+      function copyCode() {
+        const code = document.getElementById("codeEditor").value;
+        navigator.clipboard.writeText(code).then(() => {
+          alert("Code copié dans le presse-papiers !");
+        });
+      }
+
+      // Initialiser la prévisualisation
+      updatePreview();
+    </script>
+  </body>
+</html>

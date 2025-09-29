@@ -1,0 +1,336 @@
+/* Styles de base pour les templates d'email */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f5f5f5;
+}
+
+.email-container {
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.email-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 30px 20px;
+  text-align: center;
+}
+
+.logo {
+  width: 60px;
+  height: 60px;
+  background-color: white;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #667eea;
+}
+
+.email-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.email-content {
+  padding: 30px 20px;
+}
+
+.email-footer {
+  background-color: #f8f9fa;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+}
+
+.footer-text {
+  font-size: 14px;
+  color: #6c757d;
+  margin: 0;
+}
+
+.horizontal-rule {
+  height: 1px;
+  background-color: #e9ecef;
+  margin: 20px 0;
+}
+
+/* Styles pour les boutons d'action */
+.action-button {
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  transition: all 0.3s ease;
+  border: none;
+  cursor: pointer;
+  margin: 10px 5px;
+}
+
+.action-button.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.action-button.primary:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.action-button.secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.action-button.secondary:hover {
+  background-color: #545b62;
+  transform: translateY(-2px);
+}
+
+.action-button.danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.action-button.danger:hover {
+  background-color: #c82333;
+  transform: translateY(-2px);
+}
+
+/* Styles pour les boîtes d'information */
+.info-box {
+  padding: 15px;
+  border-radius: 6px;
+  margin: 15px 0;
+  border-left: 4px solid;
+}
+
+.info-box.info {
+  background-color: #d1ecf1;
+  border-left-color: #17a2b8;
+  color: #0c5460;
+}
+
+.info-box.success {
+  background-color: #d4edda;
+  border-left-color: #28a745;
+  color: #155724;
+}
+
+.info-box.warning {
+  background-color: #fff3cd;
+  border-left-color: #ffc107;
+  color: #856404;
+}
+
+.info-box.error {
+  background-color: #f8d7da;
+  border-left-color: #dc3545;
+  color: #721c24;
+}
+
+/* Styles pour les éléments de contenu */
+.content-section {
+  margin: 20px 0;
+}
+
+.content-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.content-text {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.highlight-text {
+  background-color: #fff3cd;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+/* Styles pour les composants d'email */
+.greeting {
+  font-size: 18px;
+  font-weight: bold;
+  color: #1e293b;
+  margin: 0 0 16px 0;
+}
+
+.paragraph {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #4b5563;
+  margin: 0 0 20px 0;
+}
+
+.footer-note {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  margin: 30px 0 0 0;
+}
+
+.email-logo {
+  margin: 0 auto;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+}
+
+.email-header-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin: 10px 0 0 0;
+  color: white;
+}
+
+.email-hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 20px 0;
+}
+
+.email-footer-text {
+  font-size: 12px;
+  color: #6b7280;
+  margin: 0 0 4px 0;
+}
+
+.info-box-title {
+  font-size: 16px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+}
+
+.info-box-text {
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.button-container {
+  text-align: center;
+  margin: 30px 0;
+}
+
+/* Styles pour les listes */
+.info-list {
+  list-style: none;
+  padding: 0;
+}
+
+.info-list li {
+  padding: 8px 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-list li:last-child {
+  border-bottom: none;
+}
+
+.info-list strong {
+  color: #333;
+  font-weight: 600;
+}
+
+/* Styles pour les liens */
+.email-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.email-link:hover {
+  text-decoration: underline;
+}
+
+/* Styles pour les tableaux */
+.info-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 15px 0;
+}
+
+.info-table th,
+.info-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.info-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Styles pour les badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-badge.pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-badge.confirmed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.cancelled {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Styles responsifs */
+@media (max-width: 600px) {
+  .email-container {
+    margin: 0;
+    border-radius: 0;
+  }
+
+  .email-header,
+  .email-content,
+  .email-footer {
+    padding: 20px 15px;
+  }
+
+  .action-button {
+    display: block;
+    width: 100%;
+    margin: 10px 0;
+  }
+}
