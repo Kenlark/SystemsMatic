@@ -13,10 +13,8 @@ export default function AppointmentSection() {
   const handleFormSubmit = async (formData: CreateAppointmentDto) => {
     try {
       setError(null);
-      console.log("Envoi de la demande de rendez-vous:", formData);
 
       const result = await appointmentService.create(formData);
-      console.log("Rendez-vous créé avec succès:", result);
 
       setIsFormSubmitted(true);
     } catch (error) {

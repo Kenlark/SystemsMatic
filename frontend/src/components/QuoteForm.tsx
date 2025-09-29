@@ -90,10 +90,6 @@ export default function QuoteForm() {
       });
       setErrors({});
     } catch (error: any) {
-      console.log("Erreur complète:", error);
-      console.log("Données envoyées:", formData);
-      console.log("Réponse du serveur:", error.response?.data);
-
       const errorMessage =
         error.response?.data?.message ||
         "Une erreur est survenue lors de l'envoi de votre demande";

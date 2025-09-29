@@ -32,31 +32,21 @@ async function bootstrap() {
     allowedOrigins.push(process.env.CORS_ORIGIN);
   }
 
-  console.log('CORS - Environment:', process.env.NODE_ENV);
-  console.log('CORS - Allowed origins:', allowedOrigins);
-  console.log('CORS - CORS_ORIGIN env:', process.env.CORS_ORIGIN);
-
   app.enableCors({
     origin: (origin, callback) => {
-      console.log('CORS - Request origin:', origin);
-
       // Autoriser les requêtes sans origin (comme Postman, curl, etc.)
       if (!origin) {
-        console.log('CORS - No origin, allowing');
         return callback(null, true);
       }
 
       // En production, être plus permissif pour éviter les problèmes CORS
       if (process.env.NODE_ENV === 'production') {
-        console.log('CORS - Production mode, allowing all origins');
         return callback(null, true);
       }
 
       if (allowedOrigins.includes(origin)) {
-        console.log('CORS - Origin allowed');
         callback(null, true);
       } else {
-        console.log('CORS - Origin not allowed:', origin);
         callback(new Error(`Origin ${origin} not allowed by CORS`), false);
       }
     },
