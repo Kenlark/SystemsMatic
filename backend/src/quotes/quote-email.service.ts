@@ -9,6 +9,7 @@ import { EmailActionsService } from '../email-actions/email-actions.service';
 export class QuoteEmailService {
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => MailService))
     private readonly mailService: MailService,
     @Inject(forwardRef(() => EmailActionsService))
     private readonly emailActionsService: EmailActionsService,

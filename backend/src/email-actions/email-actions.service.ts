@@ -1,4 +1,10 @@
-import { Injectable, Logger, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  Inject,
+  forwardRef,
+} from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AppointmentsService } from '../appointments/appointments.service';
 import { QuotesService } from '../quotes/quotes.service';
@@ -12,8 +18,11 @@ export class EmailActionsService {
 
   constructor(
     private readonly prisma: PrismaService,
+    @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentsService: AppointmentsService,
+    @Inject(forwardRef(() => QuotesService))
     private readonly quotesService: QuotesService,
+    @Inject(forwardRef(() => MailService))
     private readonly mailService: MailService,
   ) {}
 
