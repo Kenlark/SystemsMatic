@@ -99,3 +99,6 @@ temp/
 
 # TypeScript
 *.tsbuildinfo
+
+# Cursor
+.cursorignore
