@@ -1,18 +1,27 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { MailService } from '../mail/mail.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { EmailRenderer } from '../email-templates/EmailRenderer';
+import { EmailActionsService } from '../email-actions/email-actions.service';
 
 @Injectable()
 export class QuoteEmailService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly mailService: MailService,
+    @Inject(forwardRef(() => EmailActionsService))
+    private readonly emailActionsService: EmailActionsService,
   ) {}
 
   async sendQuoteNotificationEmail(quoteDto: CreateQuoteDto, quoteId: string) {
     const subject = `Nouvelle demande de devis - ${quoteDto.firstName} ${quoteDto.lastName}`;
+
+    // Générer les tokens d'actions
+    const [acceptToken, rejectToken] = await Promise.all([
+      this.emailActionsService.createActionToken('quote', quoteId, 'accept'),
+      this.emailActionsService.createActionToken('quote', quoteId, 'reject'),
+    ]);
 
     const html = await EmailRenderer.renderAdminQuoteNotification({
       contactName: `${quoteDto.firstName} ${quoteDto.lastName}`,
@@ -20,6 +29,10 @@ export class QuoteEmailService {
       contactPhone: quoteDto.phone,
       acceptPhone: quoteDto.acceptPhone,
       message: quoteDto.message,
+      quoteId,
+      acceptToken,
+      rejectToken,
+      baseUrl: process.env.PUBLIC_URL || 'http://localhost:3000',
     });
 
     // Utiliser l'email admin depuis les variables d'environnement

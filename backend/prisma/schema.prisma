@@ -170,3 +170,19 @@ model AdminUser {
   @@index([email])
   @@index([role])
 }
+
+model EmailActionToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  type      String   // 'appointment' ou 'quote'
+  entityId  String   // ID de l'entité concernée
+  action    String   // 'accept', 'reject', 'reschedule', etc.
+  isUsed    Boolean  @default(false)
+  usedAt    DateTime? @db.Timestamptz(6)
+  expiresAt DateTime @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([token])
+  @@index([type, entityId])
+  @@index([expiresAt])
+}

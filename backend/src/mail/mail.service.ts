@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { Resend } from 'resend';
 import { Appointment, Contact } from '@prisma/client';
 import dayjs from 'dayjs';
@@ -6,6 +6,7 @@ import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
 import 'dayjs/locale/fr';
 import { EmailRenderer } from '../email-templates/EmailRenderer';
+import { EmailActionsService } from '../email-actions/email-actions.service';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -29,7 +30,10 @@ export class MailService {
   private readonly logger = new Logger(MailService.name);
   private resend?: Resend;
 
-  constructor() {
+  constructor(
+    @Inject(forwardRef(() => EmailActionsService))
+    private readonly emailActionsService: EmailActionsService,
+  ) {
     const apiKey = process.env.RESEND_API_KEY;
 
     if (apiKey) {
@@ -256,6 +260,25 @@ export class MailService {
 
     const subject = `Nouvelle demande de rendez-vous - ${contact.firstName} ${contact.lastName}`;
 
+    // Générer les tokens d'actions
+    const [acceptToken, rejectToken, rescheduleToken] = await Promise.all([
+      this.emailActionsService.createActionToken(
+        'appointment',
+        appointment.id,
+        'accept',
+      ),
+      this.emailActionsService.createActionToken(
+        'appointment',
+        appointment.id,
+        'reject',
+      ),
+      this.emailActionsService.createActionToken(
+        'appointment',
+        appointment.id,
+        'reschedule',
+      ),
+    ]);
+
     const html = await EmailRenderer.renderAdminAppointmentNotification({
       contactName: `${contact.firstName} ${contact.lastName}`,
       contactEmail: contact.email,
@@ -264,6 +287,11 @@ export class MailService {
       reason: appointment.reason,
       reasonOther: appointment.reasonOther,
       message: appointment.message,
+      appointmentId: appointment.id,
+      acceptToken,
+      rejectToken,
+      rescheduleToken,
+      baseUrl: EMAIL_CONFIG.BASE_URL,
     });
 
     // Utiliser l'email admin depuis les variables d'environnement
@@ -271,5 +299,34 @@ export class MailService {
       process.env.ADMIN_EMAIL || 'kenzokerachi@hotmail.fr (dev test)';
 
     await this.send(adminEmail, subject, html);
+  }
+
+  /**
+   * Envoie un email de confirmation de devis accepté
+   */
+  async sendQuoteAccepted(quote: any): Promise<void> {
+    const subject = 'Votre devis a été accepté - SystemsMatic';
+
+    const html = await EmailRenderer.renderQuoteAccepted({
+      contactName: `${quote.contact.firstName} ${quote.contact.lastName}`,
+      projectDescription: quote.projectDescription,
+    });
+
+    await this.send(quote.contact.email, subject, html);
+  }
+
+  /**
+   * Envoie un email de refus de devis
+   */
+  async sendQuoteRejected(quote: any): Promise<void> {
+    const subject = 'Réponse à votre demande de devis - SystemsMatic';
+
+    const html = await EmailRenderer.renderQuoteRejected({
+      contactName: `${quote.contact.firstName} ${quote.contact.lastName}`,
+      projectDescription: quote.projectDescription,
+      rejectionReason: quote.rejectionReason,
+    });
+
+    await this.send(quote.contact.email, subject, html);
   }
 }

@@ -11,6 +11,10 @@ interface AdminQuoteNotificationProps {
   contactPhone?: string;
   acceptPhone: boolean;
   message: string;
+  quoteId: string;
+  acceptToken: string;
+  rejectToken: string;
+  baseUrl: string;
 }
 
 export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
@@ -19,6 +23,10 @@ export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
   contactPhone,
   acceptPhone,
   message,
+  quoteId,
+  acceptToken,
+  rejectToken,
+  baseUrl,
 }) => {
   return (
     <BaseEmailAdmin title="Nouvelle demande de devis" type="quote">
@@ -73,19 +81,39 @@ export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
         </div>
       </AdminInfoBox>
 
-      <AdminInfoBox type="action" title="⚡ Action requise">
+      <AdminInfoBox type="action" title="⚡ Actions rapides">
+        <div>
+          <p style={{ margin: '0 0 15px 0' }}>
+            <strong>Gérez cette demande directement depuis cet email :</strong>
+          </p>
+        </div>
+      </AdminInfoBox>
+
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        <div style={{ margin: '5px', display: 'inline-block' }}>
+          <AdminActionButton
+            href={`${baseUrl}/email-actions/quotes/${quoteId}/accept?token=${acceptToken}`}
+            variant="success"
+          >
+            ✅ Accepter le devis
+          </AdminActionButton>
+        </div>
+
+        <div style={{ margin: '5px', display: 'inline-block' }}>
+          <AdminActionButton
+            href={`${baseUrl}/email-actions/quotes/${quoteId}/reject?token=${rejectToken}`}
+            variant="danger"
+          >
+            ❌ Refuser le devis
+          </AdminActionButton>
+        </div>
+      </div>
+
+      <AdminInfoBox type="action" title="📞 Contact direct">
         <div>
           <p style={{ margin: '0 0 10px 0' }}>
-            <strong>
-              Contactez le client dans les plus brefs délais pour :
-            </strong>
+            <strong>Ou contactez le client directement :</strong>
           </p>
-          <ul style={{ margin: '0', paddingLeft: '20px' }}>
-            <li>Analyser les besoins du projet</li>
-            <li>Établir un devis personnalisé</li>
-            <li>Planifier une éventuelle visite</li>
-            <li>Proposer des solutions adaptées</li>
-          </ul>
         </div>
       </AdminInfoBox>
 
@@ -97,7 +125,7 @@ export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
       </AdminActionButton>
 
       {contactPhone && acceptPhone && (
-        <AdminActionButton href={`tel:${contactPhone}`} variant="success">
+        <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
           📞 Appeler le client
         </AdminActionButton>
       )}

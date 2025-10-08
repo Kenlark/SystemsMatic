@@ -13,6 +13,11 @@ interface AdminAppointmentNotificationProps {
   reason?: string;
   reasonOther?: string;
   message?: string;
+  appointmentId: string;
+  acceptToken: string;
+  rejectToken: string;
+  rescheduleToken: string;
+  baseUrl: string;
 }
 
 export const AdminAppointmentNotification: React.FC<
@@ -25,6 +30,11 @@ export const AdminAppointmentNotification: React.FC<
   reason,
   reasonOther,
   message,
+  appointmentId,
+  acceptToken,
+  rejectToken,
+  rescheduleToken,
+  baseUrl,
 }) => {
   return (
     <BaseEmailAdmin title="Nouvelle demande de rendez-vous" type="appointment">
@@ -94,18 +104,48 @@ export const AdminAppointmentNotification: React.FC<
         </div>
       </AdminInfoBox>
 
-      <AdminInfoBox type="action" title="⚡ Action requise">
+      <AdminInfoBox type="action" title="⚡ Actions rapides">
+        <div>
+          <p style={{ margin: '0 0 15px 0' }}>
+            <strong>Gérez cette demande directement depuis cet email :</strong>
+          </p>
+        </div>
+      </AdminInfoBox>
+
+      <div style={{ textAlign: 'center', margin: '20px 0' }}>
+        <div style={{ margin: '5px', display: 'inline-block' }}>
+          <AdminActionButton
+            href={`${baseUrl}/email-actions/appointments/${appointmentId}/accept?token=${acceptToken}`}
+            variant="success"
+          >
+            ✅ Accepter le rendez-vous
+          </AdminActionButton>
+        </div>
+
+        <div style={{ margin: '5px', display: 'inline-block' }}>
+          <AdminActionButton
+            href={`${baseUrl}/email-actions/appointments/${appointmentId}/reject?token=${rejectToken}`}
+            variant="danger"
+          >
+            ❌ Refuser le rendez-vous
+          </AdminActionButton>
+        </div>
+
+        <div style={{ margin: '5px', display: 'inline-block' }}>
+          <AdminActionButton
+            href={`${baseUrl}/email-actions/appointments/${appointmentId}/propose-reschedule?token=${rescheduleToken}`}
+            variant="warning"
+          >
+            📅 Proposer une reprogrammation
+          </AdminActionButton>
+        </div>
+      </div>
+
+      <AdminInfoBox type="action" title="📞 Contact direct">
         <div>
           <p style={{ margin: '0 0 10px 0' }}>
-            <strong>
-              Contactez le client dans les plus brefs délais pour :
-            </strong>
+            <strong>Ou contactez le client directement :</strong>
           </p>
-          <ul style={{ margin: '0', paddingLeft: '20px' }}>
-            <li>Confirmer la disponibilité</li>
-            <li>Valider le créneau horaire</li>
-            <li>Préparer l'intervention</li>
-          </ul>
         </div>
       </AdminInfoBox>
 
@@ -117,7 +157,7 @@ export const AdminAppointmentNotification: React.FC<
       </AdminActionButton>
 
       {contactPhone && (
-        <AdminActionButton href={`tel:${contactPhone}`} variant="success">
+        <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
           📞 Appeler le client
         </AdminActionButton>
       )}

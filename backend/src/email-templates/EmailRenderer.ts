@@ -112,6 +112,11 @@ export class EmailRenderer {
     reason?: string;
     reasonOther?: string;
     message?: string;
+    appointmentId: string;
+    acceptToken: string;
+    rejectToken: string;
+    rescheduleToken: string;
+    baseUrl: string;
   }): Promise<string> {
     return this.renderTemplate(
       React.createElement(AdminAppointmentNotification, props),
@@ -124,6 +129,10 @@ export class EmailRenderer {
     contactPhone?: string;
     acceptPhone: boolean;
     message: string;
+    quoteId: string;
+    acceptToken: string;
+    rejectToken: string;
+    baseUrl: string;
   }): Promise<string> {
     return this.renderTemplate(
       React.createElement(AdminQuoteNotification, props),
