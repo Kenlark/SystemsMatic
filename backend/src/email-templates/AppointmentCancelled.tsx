@@ -21,8 +21,14 @@ export const AppointmentCancelled: React.FC<AppointmentCancelledProps> = ({
 
       <Text style={paragraph}>
         Votre rendez-vous{' '}
-        {cancelledDate ? `du <strong>${cancelledDate}</strong>` : ''} a bien été
-        annulé.
+        {cancelledDate ? (
+          <>
+            du <strong>{cancelledDate}</strong>
+          </>
+        ) : (
+          ''
+        )}{' '}
+        a bien été annulé.
       </Text>
 
       <InfoBox type="success" title="✅ Confirmation">
