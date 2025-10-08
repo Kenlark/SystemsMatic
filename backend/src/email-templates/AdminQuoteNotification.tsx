@@ -118,17 +118,44 @@ export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
       </AdminInfoBox>
 
       <div style={{ textAlign: 'center', margin: '10px 0' }}>
-        <AdminActionButton
-          href={`mailto:${contactEmail}?subject=Devis%20personnalis%C3%A9%20-%20SystemsMatic`}
-          variant="primary"
+        <a
+          href={`mailto:${contactEmail}?subject=Devis personnalisé - SystemsMatic`}
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            borderRadius: '6px',
+            textDecoration: 'none',
+            fontWeight: '600',
+            fontSize: '16px',
+            textAlign: 'center',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            margin: '10px 5px',
+          }}
         >
           📧 Répondre au client
-        </AdminActionButton>
+        </a>
 
         {contactPhone && acceptPhone && (
-          <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
+          <a
+            href={`tel:${contactPhone}`}
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '16px',
+              textAlign: 'center',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              margin: '10px 5px',
+            }}
+          >
             📞 Appeler le client
-          </AdminActionButton>
+          </a>
         )}
       </div>
 

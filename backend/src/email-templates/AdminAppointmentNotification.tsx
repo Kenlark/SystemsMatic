@@ -150,17 +150,44 @@ export const AdminAppointmentNotification: React.FC<
       </AdminInfoBox>
 
       <div style={{ textAlign: 'center', margin: '10px 0' }}>
-        <AdminActionButton
-          href={`mailto:${contactEmail}?subject=Confirmation%20de%20votre%20rendez-vous%20-%20SystemsMatic`}
-          variant="primary"
+        <a
+          href={`mailto:${contactEmail}?subject=Confirmation de votre rendez-vous - SystemsMatic`}
+          style={{
+            display: 'inline-block',
+            padding: '12px 24px',
+            borderRadius: '6px',
+            textDecoration: 'none',
+            fontWeight: '600',
+            fontSize: '16px',
+            textAlign: 'center',
+            backgroundColor: '#007bff',
+            color: 'white',
+            border: 'none',
+            margin: '10px 5px',
+          }}
         >
           📧 Répondre au client
-        </AdminActionButton>
+        </a>
 
         {contactPhone && (
-          <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
+          <a
+            href={`tel:${contactPhone}`}
+            style={{
+              display: 'inline-block',
+              padding: '12px 24px',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '16px',
+              textAlign: 'center',
+              backgroundColor: '#6c757d',
+              color: 'white',
+              border: 'none',
+              margin: '10px 5px',
+            }}
+          >
             📞 Appeler le client
-          </AdminActionButton>
+          </a>
         )}
       </div>
 
