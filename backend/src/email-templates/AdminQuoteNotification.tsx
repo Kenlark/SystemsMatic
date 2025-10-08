@@ -117,18 +117,20 @@ export const AdminQuoteNotification: React.FC<AdminQuoteNotificationProps> = ({
         </div>
       </AdminInfoBox>
 
-      <AdminActionButton
-        href={`mailto:${contactEmail}?subject=Devis personnalisé - SystemsMatic`}
-        variant="primary"
-      >
-        📧 Répondre au client
-      </AdminActionButton>
-
-      {contactPhone && acceptPhone && (
-        <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
-          📞 Appeler le client
+      <div style={{ textAlign: 'center', margin: '10px 0' }}>
+        <AdminActionButton
+          href={`mailto:${contactEmail}?subject=Devis%20personnalis%C3%A9%20-%20SystemsMatic`}
+          variant="primary"
+        >
+          📧 Répondre au client
         </AdminActionButton>
-      )}
+
+        {contactPhone && acceptPhone && (
+          <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
+            📞 Appeler le client
+          </AdminActionButton>
+        )}
+      </div>
 
       <Text style={commonStyles.footerNote}>
         Cette notification a été générée automatiquement. Merci de traiter cette

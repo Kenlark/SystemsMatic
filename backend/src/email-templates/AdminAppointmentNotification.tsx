@@ -149,18 +149,20 @@ export const AdminAppointmentNotification: React.FC<
         </div>
       </AdminInfoBox>
 
-      <AdminActionButton
-        href={`mailto:${contactEmail}?subject=Confirmation de votre rendez-vous`}
-        variant="primary"
-      >
-        📧 Répondre au client
-      </AdminActionButton>
-
-      {contactPhone && (
-        <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
-          📞 Appeler le client
+      <div style={{ textAlign: 'center', margin: '10px 0' }}>
+        <AdminActionButton
+          href={`mailto:${contactEmail}?subject=Confirmation%20de%20votre%20rendez-vous%20-%20SystemsMatic`}
+          variant="primary"
+        >
+          📧 Répondre au client
         </AdminActionButton>
-      )}
+
+        {contactPhone && (
+          <AdminActionButton href={`tel:${contactPhone}`} variant="secondary">
+            📞 Appeler le client
+          </AdminActionButton>
+        )}
+      </div>
 
       <Text style={commonStyles.footerNote}>
         Cette notification a été générée automatiquement. Merci de traiter cette
