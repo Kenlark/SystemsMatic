@@ -8,7 +8,11 @@ import { MailModule } from '../mail/mail.module';
 import { EmailActionsModule } from '../email-actions/email-actions.module';
 
 @Module({
-  imports: [PrismaModule, MailModule, forwardRef(() => EmailActionsModule)],
+  imports: [
+    PrismaModule,
+    forwardRef(() => MailModule),
+    forwardRef(() => EmailActionsModule),
+  ],
   controllers: [QuotesController],
   providers: [QuotesService, QuoteEmailService, QuoteManagementService],
   exports: [QuotesService, QuoteEmailService, QuoteManagementService],

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AppointmentsController } from './appointments.controller';
 import { AppointmentsService } from './appointments.service';
 import { PrismaService } from '../prisma/prisma.service';
@@ -14,7 +14,7 @@ import {
 } from './services';
 
 @Module({
-  imports: [QueueModule, MailModule],
+  imports: [QueueModule, forwardRef(() => MailModule)],
   controllers: [AppointmentsController],
   providers: [
     AppointmentsService,
