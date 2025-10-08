@@ -119,6 +119,24 @@ export class EmailActionsService {
   }
 
   /**
+   * Récupérer les détails d'un rendez-vous
+   */
+  async getAppointmentDetails(id: string) {
+    const appointment = await this.prisma.appointment.findUnique({
+      where: { id },
+      include: {
+        contact: true,
+      },
+    });
+
+    if (!appointment) {
+      throw new BadRequestException('Rendez-vous non trouvé');
+    }
+
+    return appointment;
+  }
+
+  /**
    * Accepter un rendez-vous via email
    */
   async acceptAppointment(

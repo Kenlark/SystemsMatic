@@ -111,17 +111,23 @@ export class EmailActionsController {
     @Query('token') token: string,
   ) {
     try {
-      // Pour les liens email, on ne peut pas proposer une nouvelle date directement
-      // On redirige vers une page de confirmation ou on affiche un message
+      // Vérifier le token et récupérer les informations du rendez-vous
+      const tokenValid = await this.emailActionsService.verifyToken(token);
+      if (!tokenValid.valid) {
+        throw new HttpException(
+          'Token invalide ou expiré',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
       return {
         success: true,
-        message:
-          'Action de reprogrammation initiée. Veuillez contacter le client pour proposer une nouvelle date.',
+        message: 'Token valide. Vous pouvez proposer une nouvelle date.',
         appointmentId: id,
       };
     } catch (error) {
       throw new HttpException(
-        error.message || 'Erreur lors de la proposition de reprogrammation',
+        error.message || 'Erreur lors de la vérification du token',
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -219,6 +225,37 @@ export class EmailActionsController {
     } catch (error) {
       throw new HttpException(
         error.message || 'Erreur lors du refus du devis',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  /**
+   * Récupérer les détails d'un rendez-vous avec le token
+   */
+  @Get('appointments/:id/details')
+  async getAppointmentDetails(
+    @Param('id') id: string,
+    @Query('token') token: string,
+  ) {
+    try {
+      const tokenValid = await this.emailActionsService.verifyToken(token);
+      if (!tokenValid.valid) {
+        throw new HttpException(
+          'Token invalide ou expiré',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      const appointment =
+        await this.emailActionsService.getAppointmentDetails(id);
+      return {
+        success: true,
+        appointment,
+      };
+    } catch (error) {
+      throw new HttpException(
+        error.message || 'Erreur lors de la récupération du rendez-vous',
         HttpStatus.BAD_REQUEST,
       );
     }
