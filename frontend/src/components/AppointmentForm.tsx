@@ -276,6 +276,7 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
               required: "Vous devez accepter les conditions",
             })}
             className="form-checkbox"
+            aria-describedby="consent-error"
           />
           <div className="form-checkbox-label">
             <label htmlFor="consent">
@@ -283,16 +284,27 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
               cadre de ma demande de rendez-vous.
             </label>
             {errors.consent && (
-              <p className="form-error">{errors.consent.message}</p>
+              <p id="consent-error" className="form-error" role="alert">
+                {errors.consent.message}
+              </p>
             )}
           </div>
         </div>
 
         {/* Bouton de soumission */}
-        <button type="submit" disabled={isSubmitting} className="form-submit">
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="form-submit"
+          aria-label={
+            isSubmitting
+              ? "Envoi du formulaire en cours..."
+              : "Envoyer la demande de rendez-vous"
+          }
+        >
           {isSubmitting ? (
             <>
-              <div className="form-spinner"></div>
+              <div className="form-spinner" aria-hidden="true"></div>
               Envoi en cours...
             </>
           ) : (

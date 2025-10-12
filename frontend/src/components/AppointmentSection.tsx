@@ -52,7 +52,7 @@ export default function AppointmentSection() {
     <>
       {/* Message d'erreur */}
       {error && (
-        <div className="error-container">
+        <div className="error-container" role="alert" aria-live="polite">
           <p className="error-message">{error}</p>
         </div>
       )}
@@ -64,7 +64,7 @@ export default function AppointmentSection() {
         </div>
       ) : (
         <div className="success-container">
-          <div className="success-icon">
+          <div className="success-icon" aria-hidden="true">
             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path
                 strokeLinecap="round"
@@ -82,6 +82,7 @@ export default function AppointmentSection() {
           <button
             onClick={() => setIsFormSubmitted(false)}
             className="success-button"
+            aria-label="Demander un nouveau rendez-vous"
           >
             Prendre un autre rendez-vous
           </button>

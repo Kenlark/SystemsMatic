@@ -209,7 +209,7 @@ export default function ChatBox() {
         <button
           className="chat-icon"
           onClick={toggleChat}
-          aria-label="Ouvrir le chat"
+          aria-label="Ouvrir le chat d'assistance"
         >
           <svg
             width="24"
@@ -249,7 +249,7 @@ export default function ChatBox() {
             <button
               className="chatbox__close-btn"
               onClick={closeChat}
-              aria-label="Fermer le chat"
+              aria-label="Fermer le chat d'assistance"
             >
               <svg
                 width="20"
@@ -310,6 +310,7 @@ export default function ChatBox() {
                           className="message__option-btn"
                           onClick={() => handleOptionClick(opt)}
                           disabled={isTyping}
+                          aria-label={`Choisir l'option: ${opt.text}`}
                         >
                           {opt.text}
                         </button>
@@ -318,7 +319,10 @@ export default function ChatBox() {
                   ) : (
                     <div className="message__bubble">
                       {message.isTyping ? (
-                        <div className="typing-indicator">
+                        <div
+                          className="typing-indicator"
+                          aria-label="L'assistant virtuel est en train de taper sa réponse..."
+                        >
                           <span></span>
                           <span></span>
                           <span></span>
@@ -328,7 +332,16 @@ export default function ChatBox() {
                       )}
                     </div>
                   )}
-                  <span className="message__time">
+                  <span
+                    className="message__time"
+                    aria-label={`Message envoyé à ${message.timestamp.toLocaleTimeString(
+                      "fr-FR",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      }
+                    )}`}
+                  >
                     {message.timestamp.toLocaleTimeString("fr-FR", {
                       hour: "2-digit",
                       minute: "2-digit",

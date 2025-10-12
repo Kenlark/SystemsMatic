@@ -23,7 +23,13 @@ export default function Navbar() {
         <button
           className="navbar__mobile-toggle"
           onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={
+            isMenuOpen
+              ? "Fermer le menu de navigation"
+              : "Ouvrir le menu de navigation"
+          }
+          aria-expanded={isMenuOpen}
+          aria-controls="navbar-menu"
         >
           <span className="navbar__mobile-toggle-icon"></span>
           <span className="navbar__mobile-toggle-icon"></span>
@@ -32,7 +38,9 @@ export default function Navbar() {
 
         {/* Navigation principale */}
         <div
+          id="navbar-menu"
           className={`navbar__menu ${isMenuOpen ? "navbar__menu--open" : ""}`}
+          aria-hidden={!isMenuOpen}
         >
           <ul className="navbar__nav-list">
             <li className="navbar__nav-item">
@@ -64,12 +72,14 @@ export default function Navbar() {
             <button
               className="navbar__phone-btn"
               onClick={() => setShowPhone(true)}
+              aria-label="Afficher le numéro de téléphone de contact"
             >
               <svg
                 className="navbar__phone-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
@@ -84,12 +94,14 @@ export default function Navbar() {
             <a
               className="navbar__phone-btn navbar__phone-btn--primary"
               href={`tel:${sanitizedPhone}`}
+              aria-label={`Appeler le numéro de téléphone ${phone}`}
             >
               <svg
                 className="navbar__phone-icon"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
+                aria-hidden="true"
               >
                 <path
                   strokeLinecap="round"
