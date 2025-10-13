@@ -21,12 +21,15 @@
   padding: var(--spacing-xl);
   text-align: center;
   border-bottom: 1px solid #f1f5f9;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .appointment-form {
   margin: 0 auto;
   padding: 2rem;
   background: white;
+  max-width: 600px;
 }
 
 .form-row {
@@ -297,6 +300,12 @@
   .appointment-form {
     padding: 1rem;
     margin: 1rem;
+    max-width: none;
+  }
+
+  .appointment-form-header {
+    max-width: none;
+    margin: 0;
   }
 
   .form-row {
