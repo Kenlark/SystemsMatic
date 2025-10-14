@@ -90,9 +90,7 @@ export class AppointmentValidationService {
     const hoursDifference = timeDifference / (1000 * 60 * 60);
 
     const isRescheduled = appointment.status === AppointmentStatus.RESCHEDULED;
-    const isRecentReschedule = hoursDifference < 24;
-    const canCancel =
-      isRescheduled || isRecentReschedule || hoursDifference >= 24;
+    const canCancel = isRescheduled || hoursDifference >= 24;
 
     if (!canCancel) {
       throw new BadRequestException(
