@@ -217,7 +217,7 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
           )}
           <p className="form-help">
             Choisissez votre créneau préféré (à partir du lendemain et dans un
-            délai maximum d'1 mois). Créneaux disponibles : 8h-12h et 14h-17h
+            délai maximum d&apos;1 mois). Créneaux disponibles : 8h-12h et 14h-17h
             (toutes les 30 minutes). Nous vous confirmerons la disponibilité et
             vous proposerons un horaire définitif.
           </p>
@@ -288,7 +288,7 @@ export default function AppointmentForm({ onSubmit }: AppointmentFormProps) {
           />
           <div className="form-checkbox-label">
             <label htmlFor="consent">
-              J'accepte que mes données personnelles soient traitées dans le
+              J&apos;accepte que mes données personnelles soient traitées dans le
               cadre de ma demande de rendez-vous.
             </label>
             {errors.consent && (
