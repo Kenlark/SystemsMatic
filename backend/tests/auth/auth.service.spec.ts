@@ -230,6 +230,39 @@ describe('AuthService', () => {
         UnauthorizedException,
       );
     });
+
+    it("devrait utiliser ADMIN comme rôle par défaut si aucun rôle n'est fourni", async () => {
+      // Arrange
+      const registerDto = {
+        email: 'newadmin@test.com',
+        password: 'password123',
+        firstName: 'New',
+        lastName: 'Admin',
+        // role non fourni (undefined)
+      };
+      mockPrismaService.adminUser.findUnique.mockResolvedValue(null);
+      mockPrismaService.adminUser.create.mockResolvedValue({
+        ...mockAdminUser,
+        email: registerDto.email,
+        role: 'ADMIN', // Rôle par défaut
+      });
+      (bcrypt.hash as jest.Mock).mockResolvedValue('hashedPassword');
+
+      // Act
+      const result = await service.register(registerDto);
+
+      // Assert
+      expect(result.access_token).toBe('mock-jwt-token');
+      expect(mockPrismaService.adminUser.create).toHaveBeenCalledWith({
+        data: {
+          email: 'newadmin@test.com',
+          password: 'hashedPassword',
+          firstName: 'New',
+          lastName: 'Admin',
+          role: 'ADMIN', // Vérifier que le rôle par défaut est utilisé
+        },
+      });
+    });
   });
 
   describe('getProfile', () => {

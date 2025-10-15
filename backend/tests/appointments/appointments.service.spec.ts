@@ -753,6 +753,19 @@ describe('AppointmentsService', () => {
       expect(adminService.getUpcoming).toHaveBeenCalledWith(7);
     });
 
+    it("devrait utiliser 7 jours par défaut si aucun paramètre n'est fourni", async () => {
+      // Arrange
+      const upcomingAppointments = [mockAppointment];
+      mockAdminService.getUpcoming.mockResolvedValue(upcomingAppointments);
+
+      // Act
+      const result = await service.getUpcomingAdmin();
+
+      // Assert
+      expect(result).toEqual(upcomingAppointments);
+      expect(adminService.getUpcoming).toHaveBeenCalledWith(7); // Vérifier que la valeur par défaut est utilisée
+    });
+
     it('devrait récupérer les statistiques (admin)', async () => {
       // Arrange
       const stats = {
