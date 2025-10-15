@@ -206,7 +206,7 @@ export class AppointmentValidationService {
   /**
    * Traite la date demandée avec timezone
    */
-  processRequestedDate(requestedAt: string | Date, timezone: string): Date {
+  processRequestedDate(requestedAt: string | Date): Date {
     if (typeof requestedAt === 'string') {
       const dateWithOffset = dayjs(requestedAt);
 

@@ -35,9 +35,6 @@ export class AppointmentsService {
       firstName,
       lastName,
       phone,
-      reason,
-      reasonOther,
-      message,
       requestedAt,
       timezone,
       consent,
@@ -53,10 +50,8 @@ export class AppointmentsService {
       });
 
       const tokens = this.validation.generateSecurityTokens();
-      const processedRequestedAt = this.validation.processRequestedDate(
-        requestedAt,
-        timezone,
-      );
+      const processedRequestedAt =
+        this.validation.processRequestedDate(requestedAt);
 
       const appointment = await this.crud.create(
         dto,

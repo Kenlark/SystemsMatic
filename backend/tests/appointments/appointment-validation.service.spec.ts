@@ -27,7 +27,7 @@ describe('AppointmentValidationService', () => {
       const timezone = 'America/Guadeloupe';
 
       // Act
-      const result = service.processRequestedDate(localDate, timezone);
+      const result = service.processRequestedDate(localDate);
 
       // Assert
       expect(result).toBeInstanceOf(Date);
@@ -40,7 +40,7 @@ describe('AppointmentValidationService', () => {
       const timezone = 'America/Guadeloupe';
 
       // Act
-      const result = service.processRequestedDate(date, timezone);
+      const result = service.processRequestedDate(date);
 
       // Assert
       expect(result).toBeInstanceOf(Date);
@@ -53,7 +53,7 @@ describe('AppointmentValidationService', () => {
       const timezone = 'America/Guadeloupe';
 
       // Act & Assert
-      expect(() => service.processRequestedDate(invalidDate, timezone)).toThrow(
+      expect(() => service.processRequestedDate(invalidDate)).toThrow(
         BadRequestException,
       );
     });
@@ -64,7 +64,7 @@ describe('AppointmentValidationService', () => {
       const timezone = 'America/Guadeloupe';
 
       // Act
-      const result = service.processRequestedDate(date, timezone);
+      const result = service.processRequestedDate(date);
 
       // Assert
       expect(result.getMinutes()).toBe(30);
