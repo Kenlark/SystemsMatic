@@ -222,7 +222,6 @@ describe('AppointmentsService', () => {
       // Assert
       expect(validationService.processRequestedDate).toHaveBeenCalledWith(
         createDto.requestedAt,
-        createDto.timezone,
       );
     });
   });

@@ -5,6 +5,7 @@ import { AppointmentsModule } from '../../src/appointments/appointments.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
 import { AppointmentStatus } from '@prisma/client';
 import { MailService } from '../../src/mail/mail.service';
+import { ConfigModule } from '@nestjs/config';
 
 describe('TI02 - AppointmentsController + Prisma Integration', () => {
   let app: INestApplication;
@@ -51,7 +52,18 @@ describe('TI02 - AppointmentsController + Prisma Integration', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AppointmentsModule],
+      imports: [
+        AppointmentsModule,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [
+            () => ({
+              JWT_SECRET: 'test-secret',
+              JWT_EXPIRES_IN: '1h',
+            }),
+          ],
+        }),
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue({

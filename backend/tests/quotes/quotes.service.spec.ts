@@ -189,6 +189,25 @@ describe('QuotesService', () => {
       // Assert
       expect(mockPrismaService.contact.upsert).toHaveBeenCalled();
     });
+
+    it('devrait gérer les erreurs lors de la création', async () => {
+      // Arrange
+      const createQuoteDto = {
+        email: 'error@test.com',
+        firstName: 'Error',
+        lastName: 'Test',
+        phone: '+590690000000',
+        message: 'Test error',
+        acceptPhone: true,
+        acceptTerms: true,
+      };
+
+      const error = new Error('Database connection failed');
+      mockPrismaService.contact.upsert.mockRejectedValue(error);
+
+      // Act & Assert
+      await expect(service.create(createQuoteDto)).rejects.toThrow(error);
+    });
   });
 
   describe('TU06 - updateStatus()', () => {
@@ -346,6 +365,171 @@ describe('QuotesService', () => {
         rejected: 2,
       });
       expect(quoteManagementService.getStats).toHaveBeenCalled();
+    });
+  });
+
+  describe('updateQuote', () => {
+    it('devrait mettre à jour un devis', async () => {
+      // Arrange
+      const updateData = {
+        projectDescription: 'Nouvelle description',
+        acceptPhone: false,
+      };
+      const updatedQuote = { ...mockQuote, ...updateData };
+      mockQuoteManagementService.updateQuote.mockResolvedValue(updatedQuote);
+
+      // Act
+      const result = await service.updateQuote('quote-123', updateData);
+
+      // Assert
+      expect(result).toEqual(updatedQuote);
+      expect(quoteManagementService.updateQuote).toHaveBeenCalledWith(
+        'quote-123',
+        updateData,
+      );
+    });
+  });
+
+  describe('findAll', () => {
+    it('devrait récupérer tous les devis avec pagination par défaut', async () => {
+      // Arrange
+      const expectedResult = {
+        data: [mockQuote],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
+      };
+      mockQuoteManagementService.findAll.mockResolvedValue(expectedResult);
+
+      // Act
+      const result = await service.findAll();
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(quoteManagementService.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        undefined,
+      );
+    });
+
+    it('devrait récupérer les devis avec pagination personnalisée', async () => {
+      // Arrange
+      const expectedResult = {
+        data: [mockQuote],
+        meta: {
+          total: 1,
+          page: 2,
+          limit: 5,
+          totalPages: 1,
+        },
+      };
+      mockQuoteManagementService.findAll.mockResolvedValue(expectedResult);
+
+      // Act
+      const result = await service.findAll(2, 5);
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(quoteManagementService.findAll).toHaveBeenCalledWith(
+        2,
+        5,
+        undefined,
+      );
+    });
+
+    it('devrait récupérer les devis avec filtre de statut', async () => {
+      // Arrange
+      const expectedResult = {
+        data: [mockQuote],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
+      };
+      mockQuoteManagementService.findAll.mockResolvedValue(expectedResult);
+
+      // Act
+      const result = await service.findAll(1, 10, 'PENDING');
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(quoteManagementService.findAll).toHaveBeenCalledWith(
+        1,
+        10,
+        'PENDING',
+      );
+    });
+  });
+
+  describe('findAllWithFilters', () => {
+    it('devrait récupérer les devis avec filtres avancés', async () => {
+      // Arrange
+      const filters = {
+        status: 'PENDING',
+        contactId: 'contact-123',
+        search: 'Jean',
+      };
+      const expectedResult = {
+        data: [mockQuote],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
+      };
+      mockQuoteManagementService.findAllWithFilters.mockResolvedValue(
+        expectedResult,
+      );
+
+      // Act
+      const result = await service.findAllWithFilters(1, 10, filters);
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(quoteManagementService.findAllWithFilters).toHaveBeenCalledWith(
+        1,
+        10,
+        filters,
+      );
+    });
+
+    it('devrait récupérer les devis avec filtres et pagination par défaut', async () => {
+      // Arrange
+      const filters = { status: 'ACCEPTED' };
+      const expectedResult = {
+        data: [mockQuote],
+        meta: {
+          total: 1,
+          page: 1,
+          limit: 10,
+          totalPages: 1,
+        },
+      };
+      mockQuoteManagementService.findAllWithFilters.mockResolvedValue(
+        expectedResult,
+      );
+
+      // Act
+      const result = await service.findAllWithFilters(
+        undefined,
+        undefined,
+        filters,
+      );
+
+      // Assert
+      expect(result).toEqual(expectedResult);
+      expect(quoteManagementService.findAllWithFilters).toHaveBeenCalledWith(
+        1,
+        10,
+        filters,
+      );
     });
   });
 });

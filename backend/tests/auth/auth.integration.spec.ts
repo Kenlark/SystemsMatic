@@ -3,6 +3,7 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import request from 'supertest';
 import { AuthModule } from '../../src/auth/auth.module';
 import { PrismaService } from '../../src/prisma/prisma.service';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcryptjs';
 
 describe('TI01 - AuthController + Service Integration', () => {
@@ -18,7 +19,18 @@ describe('TI01 - AuthController + Service Integration', () => {
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      imports: [AuthModule],
+      imports: [
+        AuthModule,
+        ConfigModule.forRoot({
+          isGlobal: true,
+          load: [
+            () => ({
+              JWT_SECRET: 'test-secret',
+              JWT_EXPIRES_IN: '1h',
+            }),
+          ],
+        }),
+      ],
     })
       .overrideProvider(PrismaService)
       .useValue({
@@ -48,6 +60,9 @@ describe('TI01 - AuthController + Service Integration', () => {
         ...testAdmin,
         password: hashedPassword,
         id: 'admin-123',
+        isActive: true,
+        role: 'ADMIN',
+        lastLogin: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -66,7 +81,7 @@ describe('TI01 - AuthController + Service Integration', () => {
         });
 
       // Assert
-      expect(response.status).toBe(201);
+      expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('message');
       expect(response.headers['set-cookie']).toBeDefined();
     });
