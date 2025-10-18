@@ -14,9 +14,7 @@ import {
   ApiTags,
   ApiOperation,
   ApiResponse,
-  ApiParam,
   ApiQuery,
-  ApiBody,
   ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AppointmentsService } from '../appointments/appointments.service';
