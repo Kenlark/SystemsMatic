@@ -168,7 +168,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <section id="about" className="section">
+      <section id="about" className="section no-wave-transition">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Notre entreprise</h2>
@@ -182,7 +182,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section no-wave-transition">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Nos atouts</h2>
@@ -210,7 +210,7 @@ export default function HomeClient() {
         </div>
       </section>
 
-      <section className="section">
+      <section className="section no-wave-transition">
         <div className="container">
           <div className="section-header">
             <h2 className="section-title">Nos réalisations</h2>
