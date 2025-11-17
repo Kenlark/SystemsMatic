@@ -84,7 +84,7 @@ model Appointment {
 
   // Relations
   emailLogs EmailLog[]
-  reminders Reminder[]
+  reminder Reminder?
 
   // Empêcher deux RDV planifiés au même instant pour un même contact
   @@unique([contactId, scheduledAt])
