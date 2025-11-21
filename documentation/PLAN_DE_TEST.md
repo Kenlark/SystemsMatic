@@ -34,35 +34,34 @@ Ce plan de test décrit la stratégie de validation et de contrôle qualité de 
 
 ## 4. Plan détaillé des tests
 
-### 4.1 Tests Unitaires (≈25)
+### 4.1 Tests Unitaires (≈24)
 
-| ID   | Composant testé                             | Description du test                                | Objectif              | Criticité | Status |
-| ---- | ------------------------------------------- | -------------------------------------------------- | --------------------- | --------- | ------ |
-| TU01 | `AuthService.validateAdmin()`               | Vérifie la validation des identifiants admin       | Sécurité              | Critique  | ✅     |
-| TU02 | `AuthService.generateToken()`               | Vérifie la génération et la validité du JWT        | Sécurité              | Critique  | ✅     |
-| TU03 | `AppointmentsService.create()`              | Vérifie la création d'un rendez-vous valide        | Logique métier        | Élevée    | ✅     |
-| TU04 | `AppointmentsService.validateDate()`        | Empêche la création avec une date passée           | Validation            | Élevée    | ✅     |
-| TU05 | `QuotesService.create()`                    | Vérifie la création d'un devis complet             | Logique métier        | Élevée    | ✅     |
-| TU06 | `QuotesService.updateStatus()`              | Vérifie le changement de statut d'un devis         | Workflow              | Moyenne   | ✅     |
-| TU07 | `MailService.sendAppointmentConfirmation()` | Vérifie l'envoi d'un email de confirmation         | Notification          | Moyenne   | ✅     |
-| TU08 | `MailService.sendQuoteToClient()`           | Vérifie l'envoi d'un email de devis                | Notification          | Moyenne   | ✅     |
-| TU09 | `date-utils.convertToUTC()`                 | Vérifie la conversion d'une date locale vers UTC   | Gestion horaire       | Moyenne   | ✅     |
-| TU10 | `validation.dto`                            | Vérifie la validation des données entrantes (DTOs) | Qualité des données   | Élevée    | ✅     |
-| TU11 | `useAppointments` (hooks)                   | Tests des hooks React pour la gestion des RDV      | Interface utilisateur | Élevée    | ✅     |
-| TU12 | `useQuotes` (hooks)                         | Tests des hooks React pour la gestion des devis    | Interface utilisateur | Élevée    | ✅     |
-| TU13 | `AdminDateTimePicker` (composant)           | Tests du sélecteur de date/heure admin             | Interface utilisateur | Moyenne   | ✅     |
-| TU14 | `NativeDateTimePicker` (composant)          | Tests du sélecteur de date/heure natif             | Interface utilisateur | Moyenne   | ✅     |
-| TU15 | `ChatBox` (composant)                       | Tests du chatbot d'assistance                      | Interface utilisateur | Moyenne   | ✅     |
-| TU16 | `AppointmentForm` (composant)               | Tests du formulaire de rendez-vous                 | Interface utilisateur | Élevée    | ✅     |
-| TU17 | `QuotesSection` (composant)                 | Tests de la section de gestion des devis           | Interface utilisateur | Élevée    | 🔄     |
-| TU18 | `AppointmentsSection` (composant)           | Tests de la section de gestion des RDV             | Interface utilisateur | Élevée    | ✅     |
-| TU19 | `AdminLogin` (composant)                    | Tests du formulaire de connexion admin             | Sécurité              | Critique  | ✅     |
-| TU20 | `QuoteAcceptModal` (composant)              | Tests de la modale d'acceptation de devis          | Interface utilisateur | Moyenne   | ✅     |
-| TU21 | `QuoteRejectModal` (composant)              | Tests de la modale de rejet de devis               | Interface utilisateur | Moyenne   | ✅     |
-| TU22 | `StatsSection` (composant)                  | Tests de l'affichage des statistiques              | Interface utilisateur | Moyenne   | ✅     |
-| TU23 | `AppointmentSection` (composant)            | Tests de la section de prise de RDV                | Interface utilisateur | Élevée    | 🔄     |
-| TU24 | `validation.ts` (utilitaires)               | Tests des fonctions de validation                  | Qualité des données   | Élevée    | ✅     |
-| TU25 | `api.ts` (services)                         | Tests des appels API                               | Communication         | Élevée    | ✅     |
+| ID   | Composant testé                             | Description du test                              | Objectif              | Criticité | Status |
+| ---- | ------------------------------------------- | ------------------------------------------------ | --------------------- | --------- | ------ |
+| TU01 | `AuthService.validateAdmin()`               | Vérifie la validation des identifiants admin     | Sécurité              | Critique  | ✅     |
+| TU02 | `AuthService.generateToken()`               | Vérifie la génération et la validité du JWT      | Sécurité              | Critique  | ✅     |
+| TU03 | `AppointmentsService.create()`              | Vérifie la création d'un rendez-vous valide      | Logique métier        | Élevée    | ✅     |
+| TU04 | `AppointmentsService.validateDate()`        | Empêche la création avec une date passée         | Validation            | Élevée    | ✅     |
+| TU05 | `QuotesService.create()`                    | Vérifie la création d'un devis complet           | Logique métier        | Élevée    | ✅     |
+| TU06 | `QuotesService.updateStatus()`              | Vérifie le changement de statut d'un devis       | Workflow              | Moyenne   | ✅     |
+| TU07 | `MailService.sendAppointmentConfirmation()` | Vérifie l'envoi d'un email de confirmation       | Notification          | Moyenne   | ✅     |
+| TU08 | `MailService.sendQuoteToClient()`           | Vérifie l'envoi d'un email de devis              | Notification          | Moyenne   | ✅     |
+| TU09 | `date-utils.convertToUTC()`                 | Vérifie la conversion d'une date locale vers UTC | Gestion horaire       | Moyenne   | ✅     |
+| TU10 | `useAppointments` (hooks)                   | Tests des hooks React pour la gestion des RDV    | Interface utilisateur | Élevée    | ✅     |
+| TU11 | `useQuotes` (hooks)                         | Tests des hooks React pour la gestion des devis  | Interface utilisateur | Élevée    | ✅     |
+| TU12 | `AdminDateTimePicker` (composant)           | Tests du sélecteur de date/heure admin           | Interface utilisateur | Moyenne   | ✅     |
+| TU13 | `NativeDateTimePicker` (composant)          | Tests du sélecteur de date/heure natif           | Interface utilisateur | Moyenne   | ✅     |
+| TU14 | `ChatBox` (composant)                       | Tests du chatbot d'assistance                    | Interface utilisateur | Moyenne   | ✅     |
+| TU15 | `AppointmentForm` (composant)               | Tests du formulaire de rendez-vous               | Interface utilisateur | Élevée    | ✅     |
+| TU16 | `QuotesSection` (composant)                 | Tests de la section de gestion des devis         | Interface utilisateur | Élevée    | 🔄     |
+| TU17 | `AppointmentsSection` (composant)           | Tests de la section de gestion des RDV           | Interface utilisateur | Élevée    | ✅     |
+| TU18 | `AdminLogin` (composant)                    | Tests du formulaire de connexion admin           | Sécurité              | Critique  | ✅     |
+| TU19 | `QuoteAcceptModal` (composant)              | Tests de la modale d'acceptation de devis        | Interface utilisateur | Moyenne   | ✅     |
+| TU20 | `QuoteRejectModal` (composant)              | Tests de la modale de rejet de devis             | Interface utilisateur | Moyenne   | ✅     |
+| TU21 | `StatsSection` (composant)                  | Tests de l'affichage des statistiques            | Interface utilisateur | Moyenne   | ✅     |
+| TU22 | `AppointmentSection` (composant)            | Tests de la section de prise de RDV              | Interface utilisateur | Élevée    | 🔄     |
+| TU23 | `validation.ts` (utilitaires)               | Tests des fonctions de validation                | Qualité des données   | Élevée    | ✅     |
+| TU24 | `api.ts` (services)                         | Tests des appels API                             | Communication         | Élevée    | ✅     |
 
 ---
 
