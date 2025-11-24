@@ -38,6 +38,7 @@ L’objectif est d’assurer une **intégration continue fiable** et un **déplo
 | Composant        | Outil / Service                       |
 | ---------------- | ------------------------------------- |
 | CI/CD            | GitHub Actions                        |
+| Qualité de code  | SonarCloud (static analysis)          |
 | Conteneurisation | Docker & Docker Hub                   |
 | Backend          | Render (hébergement NestJS)           |
 | Frontend         | Netlify (hébergement Next.js)         |
@@ -100,7 +101,14 @@ Le workflow CI (`.github/workflows/ci.yml`) s’exécute sur :
   NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
   ```
 
-#### d. **Notifications Discord**
+#### d. **SonarCloud — Static Analysis**
+
+- Télécharge automatiquement les artefacts `backend-coverage` et `frontend-coverage`
+- Lance l’action `sonarsource/sonarqube-scan-action@v2` à partir des propriétés définies dans `sonar-project.properties`
+- Publie les métriques (bugs, vulnérabilités, dette, couverture consolidée) dans SonarCloud
+- Requiert les secrets `SONAR_HOST_URL` (URL de l’instance SonarCloud) et `SONAR_TOKEN` (token d’analyse)
+
+#### e. **Notifications Discord**
 
 - Exécuté systématiquement (`if: always()`)
 - Affiche dynamiquement le résultat de chaque job (backend, frontend, e2e)
@@ -115,6 +123,7 @@ Résultats des modules :
 - Backend : success
 - Frontend : success
 - E2E : success
+- SonarCloud : success
 
 Consulter les logs détaillés :
 https://github.com/Kenlark/Systemsmatic/actions/runs/XXXXXXXXX
@@ -184,6 +193,8 @@ Le workflow CD (`.github/workflows/cd.yml`) s’exécute automatiquement :
 | `NETLIFY_BUILD_HOOK`  | URL du webhook de build Netlify                           |
 | `DISCORD_WEBHOOK`     | URL du webhook Discord pour notifications                 |
 | `NEXT_PUBLIC_API_URL` | URL publique de l’API (Render) utilisée par les tests E2E |
+| `SONAR_HOST_URL`      | URL de l’instance SonarCloud                              |
+| `SONAR_TOKEN`         | Token SonarCloud avec droits d’analyse                    |
 
 ---
 

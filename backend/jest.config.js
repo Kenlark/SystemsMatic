@@ -37,7 +37,7 @@ module.exports = {
     '!src/appointments/dto/create-appointment.dto.ts',
     '!src/appointments/dto/confirm-appointment.dto.ts',
   ],
-  coverageDirectory: '../coverage',
+  coverageDirectory: '<rootDir>/coverage',
   testEnvironment: 'node',
   coverageThreshold: {
     global: {
