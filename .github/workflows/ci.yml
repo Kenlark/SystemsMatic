@@ -11,6 +11,10 @@ on:
   pull_request:
     branches: [main, develop]
 
+env:
+  SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
 jobs:
   backend:
     name: Backend — Lint, Tests & Coverage
@@ -68,6 +72,7 @@ jobs:
   frontend:
     name: Frontend — Lint, Type-check, Build & Coverage
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: ./frontend
@@ -156,10 +161,39 @@ jobs:
           name: playwright-report
           path: frontend/playwright-report
 
+  sonarqube:
+    name: SonarCloud — Static Analysis
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend-coverage
+
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend-coverage
+
+      - name: SonarCloud Scan
+        if: ${{ env.SONAR_TOKEN != '' && env.SONAR_HOST_URL != '' }}
+        uses: SonarSource/sonarcloud-github-action@e44258b109568baa0df60ed515909fc6c72cba92
+        env:
+          SONAR_TOKEN: ${{ env.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ env.SONAR_HOST_URL }}
+
   notify:
     name: Notifications
     runs-on: ubuntu-latest
-    needs: [backend, frontend, e2e-tests, check-e2e-changes]
+    needs: [backend, frontend, e2e-tests, check-e2e-changes, sonarqube]
     if: always()
 
     steps:
@@ -168,7 +202,8 @@ jobs:
         run: |
           if [[ "${{ needs.backend.result }}" == "success" && \
                 "${{ needs.frontend.result }}" == "success" && \
-                ( "${{ needs.e2e-tests.result }}" == "success" || "${{ needs.e2e-tests.result }}" == "skipped" ) ]]; then
+                ( "${{ needs.e2e-tests.result }}" == "success" || "${{ needs.e2e-tests.result }}" == "skipped" ) && \
+                ( "${{ needs.sonarqube.result }}" == "success" || "${{ needs.sonarqube.result }}" == "skipped" ) ]]; then
             echo "message=**Intégration continue réussie — System's Matic**" >> "$GITHUB_OUTPUT"
           else
             echo "message=**Échec de l'intégration continue — System's Matic**" >> "$GITHUB_OUTPUT"
@@ -186,6 +221,7 @@ jobs:
             - Backend : ${{ needs.backend.result }}
             - Frontend : ${{ needs.frontend.result }}
             - E2E : ${{ needs.e2e-tests.result }}
+            - SonarQube : ${{ needs.sonarqube.result }}
 
             Logs détaillés :
             ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
