@@ -157,33 +157,33 @@ jobs:
           path: frontend/playwright-report
 
   sonarqube:
-  name: SonarCloud — Static Analysis
-  runs-on: ubuntu-latest
-  needs: [backend, frontend]
-  if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
+    name: SonarCloud — Static Analysis
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: ${{ secrets.SONAR_TOKEN != '' && secrets.SONAR_HOST_URL != '' }}
 
-  steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Download backend coverage
-      uses: actions/download-artifact@v4
-      with:
-        name: backend-coverage
-        path: backend-coverage
+      - name: Download backend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage
+          path: backend-coverage
 
-    - name: Download frontend coverage
-      uses: actions/download-artifact@v4
-      with:
-        name: frontend-coverage
-        path: frontend-coverage
+      - name: Download frontend coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage
+          path: frontend-coverage
 
-    - name: SonarCloud Scan
-      uses: SonarSource/sonarcloud-github-action@v3
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: SonarCloud Scan
+        uses: SonarSource/sonarcloud-github-action@v3
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
   notify:
     name: Notifications

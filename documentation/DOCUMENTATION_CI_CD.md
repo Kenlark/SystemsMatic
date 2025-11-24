@@ -38,7 +38,7 @@ L’objectif est d’assurer une **intégration continue fiable** et un **déplo
 | Composant        | Outil / Service                       |
 | ---------------- | ------------------------------------- |
 | CI/CD            | GitHub Actions                        |
-| Qualité de code  | SonarQube (static analysis)           |
+| Qualité de code  | SonarCloud (static analysis)          |
 | Conteneurisation | Docker & Docker Hub                   |
 | Backend          | Render (hébergement NestJS)           |
 | Frontend         | Netlify (hébergement Next.js)         |
@@ -101,12 +101,12 @@ Le workflow CI (`.github/workflows/ci.yml`) s’exécute sur :
   NEXT_PUBLIC_API_URL: ${{ secrets.NEXT_PUBLIC_API_URL }}
   ```
 
-#### d. **SonarQube — Static Analysis**
+#### d. **SonarCloud — Static Analysis**
 
 - Télécharge automatiquement les artefacts `backend-coverage` et `frontend-coverage`
 - Lance l’action `sonarsource/sonarqube-scan-action@v2` à partir des propriétés définies dans `sonar-project.properties`
-- Publie les métriques (bugs, vulnérabilités, dette, couverture consolidée) dans SonarQube/SonarCloud
-- Requiert les secrets `SONAR_HOST_URL` (URL de l’instance) et `SONAR_TOKEN` (token d’analyse)
+- Publie les métriques (bugs, vulnérabilités, dette, couverture consolidée) dans SonarCloud
+- Requiert les secrets `SONAR_HOST_URL` (URL de l’instance SonarCloud) et `SONAR_TOKEN` (token d’analyse)
 
 #### e. **Notifications Discord**
 
@@ -123,7 +123,7 @@ Résultats des modules :
 - Backend : success
 - Frontend : success
 - E2E : success
-- SonarQube : success
+- SonarCloud : success
 
 Consulter les logs détaillés :
 https://github.com/Kenlark/Systemsmatic/actions/runs/XXXXXXXXX
