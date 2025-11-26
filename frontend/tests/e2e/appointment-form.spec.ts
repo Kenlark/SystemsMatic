@@ -49,16 +49,53 @@ test.describe("Formulaire de rendez-vous — Page d'accueil", () => {
     // Sélection d'un motif (exemple : Installation)
     await page.selectOption('select[name="reason"]', { label: "Installation" });
 
-    // Sélectionner une date valide (demain)
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const dateStr = tomorrow.toISOString().slice(0, 10); // YYYY-MM-DD
+    // Récupérer la date minimale permise par le composant (garanti valide)
+    const dateInput = page.locator("input#date-picker");
+    const minDate = await dateInput.getAttribute("min");
+    const maxDate = await dateInput.getAttribute("max");
+    if (!minDate) {
+      throw new Error("Impossible de déterminer la date minimale autorisée");
+    }
+    const targetDate = await page.evaluate(
+      ({ min, max }) => {
+        const toIsoDate = (date: Date) => {
+          const year = date.getFullYear();
+          const month = `${date.getMonth() + 1}`.padStart(2, "0");
+          const day = `${date.getDate()}`.padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        };
 
-    // Remplir le champ date
-    await page.fill("input#date-picker", dateStr);
+        const base = new Date(`${min}T12:00:00`);
+        base.setDate(base.getDate() + 1); // garantit > 24h après le min
 
-    // Sélectionner une heure (8h00)
-    await page.selectOption("select#time-picker", "08:00");
+        if (max) {
+          const maxDate = new Date(`${max}T12:00:00`);
+          if (base > maxDate) {
+            return max;
+          }
+        }
+
+        return toIsoDate(base);
+      },
+      { min: minDate, max: maxDate }
+    );
+    await dateInput.fill(targetDate);
+
+    // Sélectionner le premier créneau disponible plutôt qu'une valeur codée
+    const timeSelect = page.locator("select#time-picker");
+    const firstSlot = await timeSelect
+      .locator('option:not([value=""])')
+      .first()
+      .getAttribute("value");
+    if (!firstSlot) {
+      throw new Error("Aucun créneau horaire disponible dans le sélecteur");
+    }
+    await page.selectOption("select#time-picker", firstSlot);
+
+    // Attendre que le champ caché `requestedAt` (piloté par RHF) soit renseigné
+    await expect(
+      page.locator('input[type="hidden"][name="requestedAt"]')
+    ).not.toHaveValue("");
 
     // Attendre un petit instant que la valeur soit propagée à React Hook Form
     await page.waitForTimeout(300);
