@@ -3,7 +3,7 @@ import { AppointmentStatus } from '@prisma/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { randomBytes } from 'crypto';
+import { randomBytes } from 'node:crypto';
 
 // Configuration des plugins dayjs
 dayjs.extend(utc);
