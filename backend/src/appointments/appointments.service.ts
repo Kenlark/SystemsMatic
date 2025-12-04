@@ -1,6 +1,6 @@
 import { Injectable, BadRequestException, Logger } from '@nestjs/common';
 import { MailService } from '../mail/mail.service';
-import { AppointmentStatus } from '@prisma/client';
+import { Appointment, AppointmentStatus } from '@prisma/client';
 import { CreateAppointmentDto } from './dto/create-appointments.dto';
 import { ConfirmAppointmentDto } from './dto/confirm-appointments.dto';
 import { AppointmentCrudService } from './services/appointment-crud.service';
@@ -100,7 +100,7 @@ export class AppointmentsService {
    * @param appointment Rendez-vous à vérifier
    * @returns true si annulation possible
    */
-  canCancelAppointment(appointment: any): boolean {
+  canCancelAppointment(appointment: Appointment): boolean {
     return this.validation.canCancelAppointment(appointment);
   }
 

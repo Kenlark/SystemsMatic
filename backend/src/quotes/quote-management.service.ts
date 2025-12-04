@@ -3,6 +3,12 @@ import { PrismaService } from '../prisma/prisma.service';
 import { UpdateQuoteDto } from './dto/update-quote.dto';
 import { QuoteFilterDto } from './dto/quote-filter.dto';
 
+export interface QuoteStatusUpdateData {
+  validUntil?: string;
+  document?: string;
+  rejectionReason?: string;
+}
+
 @Injectable()
 export class QuoteManagementService {
   private readonly logger = new Logger(QuoteManagementService.name);
@@ -49,8 +55,8 @@ export class QuoteManagementService {
     });
   }
 
-  async updateStatus(id: string, status: string, data?: any) {
-    const updateData: any = { status };
+  async updateStatus(id: string, status: string, data?: QuoteStatusUpdateData) {
+    const updateData: Record<string, unknown> = { status };
 
     // Mise à jour des timestamps selon le statut
     switch (status) {

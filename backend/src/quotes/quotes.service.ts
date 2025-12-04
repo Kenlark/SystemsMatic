@@ -2,7 +2,12 @@ import { Injectable, Logger } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateQuoteDto } from './dto/create-quote.dto';
 import { QuoteEmailService } from './quote-email.service';
-import { QuoteManagementService } from './quote-management.service';
+import {
+  QuoteManagementService,
+  QuoteStatusUpdateData,
+} from './quote-management.service';
+import { QuoteFilterDto } from './dto/quote-filter.dto';
+import { UpdateQuoteDto } from './dto/update-quote.dto';
 
 @Injectable()
 export class QuotesService {
@@ -85,7 +90,7 @@ export class QuotesService {
     return this.quoteManagementService.findOne(id);
   }
 
-  async updateStatus(id: string, status: string, data?: any) {
+  async updateStatus(id: string, status: string, data?: QuoteStatusUpdateData) {
     const updatedQuote = await this.quoteManagementService.updateStatus(
       id,
       status,
@@ -109,11 +114,11 @@ export class QuotesService {
     return this.quoteManagementService.getStats();
   }
 
-  async findAllWithFilters(page = 1, limit = 10, filters: any) {
+  async findAllWithFilters(page = 1, limit = 10, filters: QuoteFilterDto) {
     return this.quoteManagementService.findAllWithFilters(page, limit, filters);
   }
 
-  async updateQuote(id: string, updateQuoteDto: any) {
+  async updateQuote(id: string, updateQuoteDto: UpdateQuoteDto) {
     return this.quoteManagementService.updateQuote(id, updateQuoteDto);
   }
 

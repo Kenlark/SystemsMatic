@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { backofficeApi } from "@/lib/backoffice-api";
+import { backofficeApi, AppointmentStats } from "@/lib/backoffice-api";
 import { Appointment, AppointmentStatus } from "@/types/appointment";
 import { showSuccess, showError } from "@/lib/toast";
 
@@ -9,7 +9,7 @@ export function useAppointments() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<AppointmentStatus | "ALL">("ALL");
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<AppointmentStats | null>(null);
 
   const fetchAppointments = async () => {
     try {
