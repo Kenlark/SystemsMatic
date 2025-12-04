@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { authApi } from "@/lib/auth-api";
+import { authApi, UserProfile } from "@/lib/auth-api";
 import { showSuccess, showError } from "@/lib/toast";
 
 interface AdminLoginProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: UserProfile) => void;
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {

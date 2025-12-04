@@ -7,13 +7,14 @@ import {
   QuoteUpdate,
   QuoteAcceptData,
   QuoteRejectData,
+  QuoteStats,
 } from "@/lib/backoffice-api";
 import { showSuccess, showError } from "@/lib/toast";
 
 export function useQuotes() {
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [quotesLoading, setQuotesLoading] = useState(true);
-  const [quotesStats, setQuotesStats] = useState<any>(null);
+  const [quotesStats, setQuotesStats] = useState<QuoteStats | null>(null);
   const [quotesFilter, setQuotesFilter] = useState<string>("");
 
   const fetchQuotes = async () => {

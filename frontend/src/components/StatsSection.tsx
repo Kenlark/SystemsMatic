@@ -2,8 +2,8 @@
 
 interface StatsSectionProps {
   activeTab: "appointments" | "quotes";
-  stats: any;
-  quotesStats: any;
+  stats: import("@/lib/backoffice-api").AppointmentStats | null;
+  quotesStats: import("@/lib/backoffice-api").QuoteStats | null;
 }
 
 export default function StatsSection({

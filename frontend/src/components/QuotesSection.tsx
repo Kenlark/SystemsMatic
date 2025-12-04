@@ -1,7 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Quote } from "@/lib/backoffice-api";
+import {
+  Quote,
+  QuoteAcceptData,
+  QuoteRejectData,
+  QuoteStats,
+  QuoteUpdate,
+} from "@/lib/backoffice-api";
 import { formatGuadeloupeDateTime } from "@/lib/date-utils";
 import QuoteEditModal from "./QuoteEditModal";
 import QuoteAcceptModal from "./QuoteAcceptModal";
@@ -10,13 +16,22 @@ import QuoteRejectModal from "./QuoteRejectModal";
 interface QuotesSectionProps {
   quotes: Quote[];
   quotesLoading: boolean;
-  quotesStats: any;
+  quotesStats: QuoteStats | null;
   quotesFilter: string;
   setQuotesFilter: (filter: string) => void;
   updateQuoteStatus: (quoteId: string, newStatus: string) => void;
-  handleSaveQuote: (editingQuote: Quote, updatedData: any) => Promise<boolean>;
-  confirmAcceptQuote: (selectedQuote: Quote, data: any) => Promise<boolean>;
-  confirmRejectQuote: (selectedQuote: Quote, data: any) => Promise<boolean>;
+  handleSaveQuote: (
+    editingQuote: Quote,
+    updatedData: QuoteUpdate
+  ) => Promise<boolean>;
+  confirmAcceptQuote: (
+    selectedQuote: Quote,
+    data: QuoteAcceptData
+  ) => Promise<boolean>;
+  confirmRejectQuote: (
+    selectedQuote: Quote,
+    data: QuoteRejectData
+  ) => Promise<boolean>;
   getQuoteStatusLabel: (status: string) => string;
   getQuoteStatusColor: (status: string) => string;
 }

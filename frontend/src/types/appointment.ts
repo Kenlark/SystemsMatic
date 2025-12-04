@@ -71,7 +71,7 @@ export interface EmailLog {
   subject: string;
   template: string;
   sentAt: Date;
-  meta?: any;
+  meta?: Record<string, unknown>;
 }
 
 export interface Reminder {

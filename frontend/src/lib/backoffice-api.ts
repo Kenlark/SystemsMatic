@@ -14,6 +14,31 @@ export interface AppointmentStatusUpdate {
   scheduledAt?: string;
 }
 
+export interface AppointmentStats {
+  total: number;
+  pending: number;
+  confirmed: number;
+  cancelled: number;
+  completed: number;
+  rejected: number;
+}
+
+export interface QuoteStats {
+  total: number;
+  pending: number;
+  processing: number;
+  sent: number;
+  accepted: number;
+  rejected: number;
+  conversionRate: string;
+}
+
+export interface QuoteStatusUpdatePayload {
+  validUntil?: string;
+  document?: string;
+  rejectionReason?: string;
+}
+
 export interface Quote {
   id: string;
   contactId: string;
@@ -116,7 +141,7 @@ export const backofficeApi = {
   },
 
   // Récupérer les statistiques
-  getStats: async () => {
+  getStats: async (): Promise<AppointmentStats> => {
     const response = await backofficeClient.get("/appointments/stats");
     return response.data;
   },
@@ -148,7 +173,11 @@ export const backofficeApi = {
   },
 
   // Mettre à jour le statut d'un devis
-  updateQuoteStatus: async (id: string, status: string, data?: any) => {
+  updateQuoteStatus: async (
+    id: string,
+    status: string,
+    data?: QuoteStatusUpdatePayload
+  ) => {
     const response = await backofficeClient.put(`/quotes/${id}/status`, {
       status,
       data,
@@ -157,7 +186,7 @@ export const backofficeApi = {
   },
 
   // Récupérer les statistiques des devis
-  getQuotesStats: async () => {
+  getQuotesStats: async (): Promise<QuoteStats> => {
     const response = await backofficeClient.get("/quotes/stats");
     return response.data;
   },
