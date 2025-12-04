@@ -18,7 +18,10 @@ export class AppointmentCrudService {
   async create(
     dto: CreateAppointmentDto,
     contactId: string,
-    tokens: any,
+    tokens: {
+      confirmationToken: string;
+      cancellationToken: string;
+    },
     processedRequestedAt: Date,
   ) {
     return this.prisma.appointment.create({

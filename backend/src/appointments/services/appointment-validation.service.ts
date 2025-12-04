@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { AppointmentStatus } from '@prisma/client';
+import { Appointment, AppointmentStatus } from '@prisma/client';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
@@ -24,7 +24,7 @@ export class AppointmentValidationService {
   /**
    * Vérifie si un rendez-vous peut être annulé (minimum 24h à l'avance)
    */
-  canCancelAppointment(appointment: any): boolean {
+  canCancelAppointment(appointment: Appointment): boolean {
     // Les demandes en attente peuvent toujours être annulées
     if (appointment.status === AppointmentStatus.PENDING) {
       return true;
@@ -52,7 +52,7 @@ export class AppointmentValidationService {
   /**
    * Vérifie si un rendez-vous peut être annulé avec validation du token
    */
-  async canCancelCheck(appointment: any, token: string) {
+  async canCancelCheck(appointment: Appointment, token: string) {
     if (appointment.cancellationToken !== token) {
       throw new BadRequestException("Token d'annulation invalide");
     }
@@ -87,7 +87,7 @@ export class AppointmentValidationService {
   /**
    * Valide qu'un rendez-vous peut être annulé
    */
-  validateCancellation(appointment: any, token: string) {
+  validateCancellation(appointment: Appointment, token: string) {
     if (appointment.cancellationToken !== token) {
       throw new BadRequestException('Token invalide');
     }
@@ -129,7 +129,7 @@ export class AppointmentValidationService {
   /**
    * Valide qu'un rendez-vous peut être confirmé
    */
-  validateConfirmation(appointment: any) {
+  validateConfirmation(appointment: Appointment) {
     if (
       appointment.status !== AppointmentStatus.PENDING &&
       appointment.status !== AppointmentStatus.RESCHEDULED
@@ -143,7 +143,7 @@ export class AppointmentValidationService {
   /**
    * Valide qu'un rendez-vous peut être reprogrammé
    */
-  validateReschedule(appointment: any) {
+  validateReschedule(appointment: Appointment) {
     if (
       appointment.status !== AppointmentStatus.PENDING &&
       appointment.status !== AppointmentStatus.RESCHEDULED
@@ -195,7 +195,7 @@ export class AppointmentValidationService {
   /**
    * Valide qu'un rendez-vous peut recevoir un rappel
    */
-  validateReminder(appointment: any) {
+  validateReminder(appointment: Appointment) {
     if (
       appointment.status !== AppointmentStatus.CONFIRMED ||
       !appointment.scheduledAt

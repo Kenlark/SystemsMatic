@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { authApi } from "@/lib/auth-api";
+import { authApi, UserProfile } from "@/lib/auth-api";
 import { AppointmentStatus } from "@/types/appointment";
 import { showSuccess, showError } from "@/lib/toast";
 import { useAppointments } from "@/hooks/useAppointments";
@@ -20,7 +20,7 @@ import "@/app/styles/native-datetime-picker.css";
 
 export default function AdminPage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<UserProfile | null>(null);
   const [activeTab, setActiveTab] = useState<"appointments" | "quotes">(
     "appointments"
   );
@@ -52,7 +52,7 @@ export default function AdminPage() {
     }
   };
 
-  const handleLoginSuccess = (userData: any) => {
+  const handleLoginSuccess = (userData: UserProfile) => {
     setUser(userData);
     setIsAuthenticated(true);
   };

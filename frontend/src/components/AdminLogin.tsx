@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { authApi } from "@/lib/auth-api";
+import { authApi, UserProfile } from "@/lib/auth-api";
 import { showSuccess, showError } from "@/lib/toast";
 
 interface AdminLoginProps {
-  onLoginSuccess: (user: any) => void;
+  onLoginSuccess: (user: UserProfile) => void;
 }
 
 export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
@@ -31,9 +31,28 @@ export default function AdminLogin({ onLoginSuccess }: AdminLoginProps) {
       setPassword("");
 
       showSuccess("Connexion réussie !");
-    } catch (error: any) {
-      const errorMessage =
-        error.response?.data?.message || "Erreur de connexion";
+    } catch (error: unknown) {
+      let errorMessage = "Erreur de connexion";
+
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        ("response" in error || "request" in error)
+      ) {
+        // Erreur de type Axios : on ne prend le message que s'il vient du backend
+        const axiosLikeError = error as {
+          response?: { data?: { message?: string } };
+        };
+        if (axiosLikeError.response?.data?.message) {
+          errorMessage = axiosLikeError.response.data.message;
+        }
+      } else if (error instanceof Error) {
+        // Autres erreurs JS classiques
+        // Pour rester cohérent avec les tests, on garde le message générique
+        // même si error.message est renseigné (par ex. "Network error").
+        errorMessage = "Erreur de connexion";
+      }
+
       setAuthError(errorMessage);
       showError(errorMessage);
     } finally {

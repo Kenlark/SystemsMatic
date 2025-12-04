@@ -24,6 +24,7 @@ import { AppointmentStatus } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { AdminGuard } from '../auth/guards/admin.guard';
 import { UpdateQuoteDto } from '../quotes/dto/update-quote.dto';
+import { QuoteStatusUpdateData } from '../quotes/quote-management.service';
 
 @ApiTags('Backoffice (Admin)')
 @Controller('backoffice')
@@ -174,7 +175,7 @@ export class BackofficeController {
   @Put('quotes/:id/status')
   async updateQuoteStatus(
     @Param('id') id: string,
-    @Body() data: { status: string; data?: any },
+    @Body() data: { status: string; data?: QuoteStatusUpdateData },
   ) {
     return this.quotesService.updateStatus(id, data.status, data.data);
   }
